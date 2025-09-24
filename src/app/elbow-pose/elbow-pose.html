@@ -1,0 +1,52 @@
+<div class="pose-analyzer">
+  <!-- Mensaje de sesión completada -->
+  <div class="session-complete" [class.visible]="showingSessionComplete">
+    <div class="session-message">
+      <h2>¡Sesión Completada!</h2>
+      <p>Has realizado {{optimalReps}} repeticiones óptimas</p>
+    </div>
+  </div>
+
+  <!-- Controles principales -->
+  <div class="controls">
+    <button class="control-btn" (click)="toggleCamera()">
+      {{ isCameraRunning ? '🛑 Detener Cámara' : '▶️ Iniciar Cámara' }}
+    </button>
+    <button class="control-btn end-session" (click)="endSession()">
+      🏁 Finalizar Sesión
+    </button>
+  </div>
+
+  <div class="metrics-summary">
+    <div class="reps-counter">
+      <h3>Repeticiones Óptimas</h3>
+      <div class="reps-number">{{ optimalReps }}</div>
+    </div>
+  </div>
+
+  <div class="video-container">
+    <div class="video-wrap">
+      <video #videoElement autoplay playsinline muted></video>
+      <canvas #canvasElement></canvas>
+    </div>
+
+    <div class="metrics-panel">
+      <div class="metric-card">
+        <h3>Codo Izquierdo</h3>
+        <div class="angle-display">{{leftElbowAngle}}°</div>
+        <div class="status-badge" [ngClass]="leftStatusClass">{{leftStatus}}</div>
+      </div>
+
+      <div class="metric-card">
+        <h3>Codo Derecho</h3>
+        <div class="angle-display">{{rightElbowAngle}}°</div>
+        <div class="status-badge" [ngClass]="rightStatusClass">{{rightStatus}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <h2>Guía de Postura</h2>
+    <p>Mantén los codos en un ángulo entre {{optimalMin}}° y {{optimalMax}}° para una postura óptima.</p>
+  </div>
+</div>
