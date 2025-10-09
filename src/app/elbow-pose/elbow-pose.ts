@@ -251,7 +251,7 @@ export class ElbowPoseComponent implements AfterViewInit {
     setTimeout(() => {
       this.showingSessionComplete = false;
       setTimeout(() => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       }, 300);
     }, 2000);
   }
