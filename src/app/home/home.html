@@ -1,47 +1,146 @@
-<!-- Seccion hero -->
+<!-- HERO SECTION -->
+
 <section class="hero">
-  <div class="container">
-    <div class="hero-content">
-      <div class="hero-text">
-        <h2 class="hero-title">AI-Powered Fitness Training</h2>
-        <p class="hero-description">
-          ¡Mejora tu postura con analisis 3D y retroalimentacion en tiempo real!
-        </p>
-        <a routerLink="/elbow-pose" class="btn-primary">Get Started</a>
-      </div>
-      
-      <div class="hero-image">
-        <div class="posture-demo">
-          <!-- Placeholder para la imagen con las lineas de psotura -->
-          <div class="demo-figure">
-            <img src="assets/img/fitness_woman.jpg" alt="fitness_woman">
-            
-            <!-- lineas del analisis de postura -->
-            <div class="posture-lines">
-              <div class="line line-1"></div>
-              <div class="line line-2"></div>
-              <div class="line line-3"></div>
-              <div class="point point-1"></div>
-              <div class="point point-2"></div>
-              <div class="point point-3"></div>
-              <div class="point point-4"></div>
-              <div class="point point-5"></div>
-            </div>
-            <!-- burbuja de retroalimentacion -->
-            <div class="feedback-bubble">
-              Alinea tu postura
-            </div>
-          </div>
+  <div class="container hero-container">
+    <div class="hero-text">
+      <h1 class="hero-title">
+        aivU.<br />
+        <span>AI, Vision, yoU.</span>
+      </h1>
+      <p class="hero-description">
+        Corrige tu postura con análisis 3D, seguimiento en tiempo real y recomendaciones personalizadas impulsadas por IA.
+      </p>
+      <a routerLink="/elbow-pose" class="btn-primary">Comienza Ahora</a>
+    </div>
+
+    <div class="hero-image">
+      <div class="demo-figure">
+        <img src="assets/img/fitness_woman.jpg" alt="Persona haciendo ejercicio" />
+        <div class="posture-lines">
+          <div class="line line-1"></div>
+          <div class="line line-2"></div>
+          <div class="line line-3"></div>
+          <div class="point point-1"></div>
+          <div class="point point-2"></div>
+          <div class="point point-3"></div>
+          <div class="point point-4"></div>
+          <div class="point point-5"></div>
         </div>
+        <div class="feedback-bubble">¡Alinea tu postura!</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- How It Works Section -->
+<!-- HOW IT WORKS SECTION -->
 <section class="how-it-works">
   <div class="container">
-    <h3 class="section-title">How It Works</h3>
-    <!-- Add more content here as needed -->
+    <h2 class="section-title">¿Cómo Funciona <span>aivU</span>?</h2>
+    <div class="steps">
+      <div class="step">
+        <img src="assets/img/step1_camera.svg" alt="Escaneo 3D" />
+        <h4>1. Escaneo 3D</h4>
+        <p>Usamos tu cámara para analizar tu postura en tiempo real mediante visión computacional.</p>
+      </div>
+      <div class="step">
+        <img src="assets/img/step2_ai.svg" alt="Análisis de IA" />
+        <h4>2. Análisis con IA</h4>
+        <p>El sistema detecta ángulos, alineaciones y posibles errores posturales con precisión milimétrica.</p>
+      </div>
+      <div class="step">
+        <img src="assets/img/step3_feedback.svg" alt="Retroalimentación" />
+        <h4>3. Retroalimentación Inteligente</h4>
+        <p>Recibe alertas y sugerencias personalizadas para mejorar tu técnica y prevenir lesiones.</p>
+      </div>
+    </div>
   </div>
 </section>
+
+<!-- BENEFITS SECTION -->
+<section class="benefits">
+  <div class="container">
+    <h2 class="section-title">Beneficios de usar <span>aivU</span></h2>
+    <div class="benefit-grid">
+      <div class="benefit">
+        <img src="assets/icons/accuracy.svg" alt="Precisión" />
+        <h4>Alta Precisión</h4>
+        <p>Detección precisa gracias a modelos de IA entrenados en miles de posturas humanas.</p>
+      </div>
+      <div class="benefit">
+        <img src="assets/icons/health.svg" alt="Salud y bienestar" />
+        <h4>Salud y Bienestar</h4>
+        <p>Previene dolores musculares y lesiones al mantener una postura correcta durante tus rutinas.</p>
+      </div>
+      <div class="benefit">
+        <img src="assets/icons/realtime.svg" alt="Tiempo real" />
+        <h4>Corrección en Tiempo Real</h4>
+        <p>Visualiza tus movimientos con guías instantáneas mientras entrenas o trabajas.</p>
+      </div>
+      <div class="benefit">
+        <img src="assets/icons/data.svg" alt="Historial" />
+        <h4>Historial y Progreso</h4>
+        <p>Monitorea tu evolución postural y observa mejoras a lo largo del tiempo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about">
+  <div class="container about-container">
+    <div class="about-text">
+      <h2>Sobre <span>aivU</span></h2>
+      <p>
+        aivU combina visión por computadora y aprendizaje profundo para crear un asistente personal de corrección postural.
+        Nuestro objetivo es ofrecer una herramienta accesible que ayude a personas de todas las edades a mejorar su salud
+        corporal y rendimiento físico.
+      </p>
+      <a routerLink="/about" class="btn-secondary">Conoce Más</a>
+    </div>
+    <div class="about-image">
+      <img src="assets/img/about_ai.jpg" alt="Sobre aivU" />
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS SECTION -->
+<section class="testimonials">
+  <div class="container">
+    <h2 class="section-title">Lo que dicen nuestros usuarios</h2>
+    <div class="testimonial-cards">
+      <div class="testimonial">
+        <p>"Desde que uso aivU mi postura al entrenar ha mejorado notablemente. ¡Es como tener un entrenador personal!"</p>
+        <h5>— Laura G.</h5>
+      </div>
+      <div class="testimonial">
+        <p>"Trabajo muchas horas sentado, y aivU me ha ayudado a mantener una postura saludable todo el día."</p>
+        <h5>— Andrés M.</h5>
+      </div>
+      <div class="testimonial">
+        <p>"La retroalimentación en tiempo real es impresionante. Siento que mi cuerpo se adapta mejor en cada sesión."</p>
+        <h5>— Sofía R.</h5>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-container">
+    <div class="footer-logo">
+      <h3>aivU</h3>
+      <p>Tu asistente inteligente para una mejor postura.</p>
+    </div>
+    <div class="footer-links">
+      <a routerLink="/about">Sobre Nosotros</a>
+      <a routerLink="/contact">Contacto</a>
+      <a routerLink="/privacy">Privacidad</a>
+    </div>
+    <div class="footer-social">
+      <a href="#"><img src="assets/icons/facebook.svg" alt="Facebook" /></a>
+      <a href="#"><img src="assets/icons/instagram.svg" alt="Instagram" /></a>
+      <a href="#"><img src="assets/icons/linkedin.svg" alt="LinkedIn" /></a>
+    </div>
+  </div>
+  <p class="footer-copy">© 2025 aivU. Todos los derechos reservados.</p>
+</footer>
