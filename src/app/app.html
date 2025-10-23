@@ -1,14 +1,30 @@
 <!-- Header/Navigation -->
-<header class="header">
+<header class="header" *ngIf="showNavbar()">
   <div class="container">
     <div class="nav-brand">
-      <h1>AivU</h1>
+      <h1>
+        <span class="brand-icon">🤖</span>
+        aivU
+      </h1>
+      <p class="brand-tagline">AI, Vision, yoU.</p>
     </div>
     <nav class="nav-menu">
-      <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-      <a routerLink="/about" class="nav-link" routerLinkActive="active">About</a>
-      <a routerLink="/features" class="nav-link" routerLinkActive="active">Features</a>
-      <a routerLink="/contact" class="nav-link" routerLinkActive="active">Contact</a>
+      <a routerLink="/home" class="nav-link" routerLinkActive="active">
+        <span class="link-icon">🏠</span>
+        Inicio
+      </a>
+      <a routerLink="/exercise-recommendation" class="nav-link" routerLinkActive="active">
+        <span class="link-icon">💪</span>
+        Ejercicios
+      </a>
+      <a routerLink="/elbow-pose" class="nav-link" routerLinkActive="active">
+        <span class="link-icon">📹</span>
+        Cámara
+      </a>
+      <a routerLink="/" class="nav-link nav-link-logout">
+        <span class="link-icon">🚪</span>
+        Salir
+      </a>
     </nav>
   </div>
 </header>

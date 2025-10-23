@@ -1,9 +1,9 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: linear-gradient(135deg, #e8f0fe 0%, #ffffff 100%);
+  background: radial-gradient(circle at top left, #0a0f1c, #111827 80%);
   padding: 20px;
-  color: #2c5282;
+  color: #e2e8f0;
 }
 
 .pose-analyzer {
@@ -22,12 +22,13 @@
 .control-btn {
   padding: 12px 24px;
   font-size: 1.1rem;
-  background: linear-gradient(45deg, #3182ce, #63b3ed);
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
   border: none;
   border-radius: 30px;
   color: white;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4), 0 0 30px rgba(56, 189, 248, 0.2);
 }
 
 .control-btn.end-session {
@@ -41,22 +42,23 @@
 
 .reps-counter {
   display: inline-block;
-  background: white;
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(10px);
   padding: 15px 30px;
   border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(49, 130, 206, 0.1);
-  border: 2px solid rgba(49, 130, 206, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(56, 189, 248, 0.1);
+  border: 2px solid rgba(56, 189, 248, 0.3);
 }
 
 .reps-counter h3 {
-  color: #3182ce;
+  color: #38bdf8;
   margin: 0 0 10px 0;
 }
 
 .reps-number {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #2c5282;
+  color: #e2e8f0;
 }
 
 .session-complete {
@@ -65,7 +67,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(10, 15, 28, 0.95);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -81,12 +84,13 @@
 }
 
 .session-message {
-  background: white;
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(10px);
   padding: 40px;
   border-radius: 20px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(49, 130, 206, 0.2);
-  border: 2px solid rgba(49, 130, 206, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 60px rgba(56, 189, 248, 0.3);
+  border: 2px solid rgba(56, 189, 248, 0.4);
   transform: scale(0.9);
   opacity: 0;
   transition: all 0.3s ease;
@@ -98,20 +102,23 @@
 }
 
 .session-message h2 {
-  color: #3182ce;
+  background: linear-gradient(90deg, #38bdf8, #00eaff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 15px;
   font-size: 2rem;
 }
 
 .session-message p {
-  color: #4a5568;
+  color: #94a3b8;
   font-size: 1.2rem;
   margin: 0;
 }
 
 .control-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6), 0 0 40px rgba(56, 189, 248, 0.3);
 }
 
 .video-container {
@@ -123,10 +130,11 @@
 .video-wrap {
   flex: 2;
   position: relative;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(56, 189, 248, 0.3);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(56, 189, 248, 0.1);
 }
 
 video, canvas {
@@ -149,17 +157,18 @@ canvas {
 }
 
 .metric-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(10px);
   padding: 20px;
   border-radius: 15px;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(49, 130, 206, 0.1);
-  border: 1px solid rgba(49, 130, 206, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(56, 189, 248, 0.1);
+  border: 2px solid rgba(56, 189, 248, 0.3);
 }
 
 .metric-card h3 {
   margin: 0 0 10px 0;
-  color: #3182ce;
+  color: #38bdf8;
   font-size: 1.2rem;
 }
 
@@ -167,7 +176,7 @@ canvas {
   font-size: 2.5rem;
   font-weight: bold;
   margin: 10px 0;
-  color: #2c5282;
+  color: #e2e8f0;
 }
 
 .status-badge {
@@ -179,9 +188,10 @@ canvas {
 }
 
 .ok {
-  background: rgba(49, 130, 206, 0.1);
-  color: #3182ce;
-  border: 1px solid #3182ce;
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
 }
 
 .bad {
@@ -191,20 +201,24 @@ canvas {
 }
 
 .info-panel {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(56, 189, 248, 0.2);
   padding: 20px;
   border-radius: 15px;
   margin-top: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(56, 189, 248, 0.05);
 }
 
 .info-panel h2 {
-  color: #4CAF50;
+  color: #38bdf8;
   margin: 0 0 15px 0;
 }
 
 .info-panel p {
   margin: 0;
   line-height: 1.6;
+  color: #94a3b8;
 }
 
 @media (max-width: 768px) {

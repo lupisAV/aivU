@@ -14,5 +14,8 @@ export const routes: Routes = [
   { path: 'elbow-pose', loadComponent: () => import('./elbow-pose/elbow-pose').then(m => m.ElbowPoseComponent) },
 
   
+  { path: 'exercise-recommendation', loadComponent: () => import('./exercise-recommendation/exercise-recommendation.component').then(m => m.ExerciseRecommendationComponent) },
+
+  
   { path: '**', redirectTo: '' }
 ];
