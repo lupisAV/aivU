@@ -1,0 +1,70 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">Guardar Ejercicio</h2>
+      <button class="close-button" (click)="onClose()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Pregunta Principal -->
+      <div class="question-section">
+        <p class="question-text">¿El ejercicio fue realizado correctamente?</p>
+        
+        <div class="label-buttons">
+          <button 
+            class="label-button correct"
+            [class.selected]="selectedLabel === 1"
+            (click)="selectLabel(1)">
+            <span class="label-icon">✓</span>
+            <span class="label-text">Correcto</span>
+          </button>
+          
+          <button 
+            class="label-button incorrect"
+            [class.selected]="selectedLabel === 0"
+            (click)="selectLabel(0)">
+            <span class="label-icon">✗</span>
+            <span class="label-text">Incorrecto</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tipo de Ejercicio -->
+      <div class="form-group">
+        <label class="form-label">Tipo de Ejercicio</label>
+        <select class="form-select" [(ngModel)]="exerciseType">
+          <option *ngFor="let type of exerciseTypes" [value]="type.value">
+            {{ type.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Notas Opcionales -->
+      <div class="form-group">
+        <label class="form-label">Notas (opcional)</label>
+        <textarea 
+          class="form-textarea"
+          [(ngModel)]="notes"
+          placeholder="Agrega comentarios sobre el ejercicio..."
+          rows="3">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="button secondary" (click)="onClose()" [disabled]="isSaving">
+        Cancelar
+      </button>
+      <button 
+        class="button primary" 
+        (click)="onSave()" 
+        [disabled]="selectedLabel === null || isSaving">
+        <span *ngIf="!isSaving">Guardar</span>
+        <span *ngIf="isSaving">Guardando...</span>
+      </button>
+    </div>
+  </div>
+</div>

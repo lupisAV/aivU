@@ -1,0 +1,74 @@
+<div class="camera-container">
+  <!-- Mensaje de Carga -->
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Inicializando servicios...</p>
+    </div>
+  }
+
+  <!-- Mensaje de Error -->
+  @if (showError) {
+    <div class="error-toast">
+      <div class="error-icon">⚠️</div>
+      <p class="error-text">{{ errorMessage }}</p>
+    </div>
+  }
+
+  <!-- Contenedor de Video y Canvas -->
+  <div class="video-wrapper">
+    <video 
+      #videoElement 
+      class="video-element"
+      autoplay 
+      playsinline>
+    </video>
+    
+    <canvas 
+      #canvasElement 
+      class="canvas-element"
+      width="1280" 
+      height="720">
+    </canvas>
+
+    <!-- Overlay de Instrucciones -->
+    @if (!isActive) {
+      <div class="instructions-overlay">
+        <div class="instructions-content">
+          <h2 class="instructions-title">¿Listo para entrenar?</h2>
+          <p class="instructions-text">
+            Posiciónate frente a la cámara y asegúrate de que tus brazos sean visibles.
+          </p>
+          <ul class="instructions-list">
+            <li>✓ Buena iluminación</li>
+            <li>✓ Fondo despejado</li>
+            <li>✓ Brazos completamente visibles</li>
+          </ul>
+        </div>
+      </div>
+    }
+
+    <!-- Indicador de Grabación -->
+    @if (isActive) {
+      <div class="recording-indicator">
+        <div class="recording-dot"></div>
+        <span>Analizando</span>
+      </div>
+    }
+  </div>
+
+  <!-- Controles -->
+  <div class="controls-panel">
+    <button 
+      class="control-button primary"
+      [class.active]="isActive"
+      [disabled]="isLoading"
+      (click)="toggleExercise()">
+      <span class="button-icon">{{ isActive ? '⏸' : '▶' }}</span>
+      <span class="button-text">{{ isActive ? 'Detener' : 'Iniciar' }}</span>
+    </button>
+  </div>
+
+  <!-- Overlay de Estadísticas -->
+  <app-exercise-overlay></app-exercise-overlay>
+</div>
