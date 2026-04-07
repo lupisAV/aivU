@@ -1,14 +1,17 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { WebSocketService, Prediction, BufferStatus } from '../../services/websocket.service';
 import { DataService } from '../../services/data.service';
+import { FeedbackService } from '../../services/feedback.service';
 import { SaveExerciseModalComponent, SaveExerciseData } from '../save-exercise-modal/save-exercise-modal.component';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-exercise-overlay',
   standalone: true,
-  imports: [CommonModule, SaveExerciseModalComponent],
+  imports: [CommonModule, SaveExerciseModalComponent, ConfirmationDialogComponent],
   templateUrl: './exercise-overlay.component.html',
   styleUrls: ['./exercise-overlay.component.css']
 })
@@ -45,12 +48,22 @@ export class ExerciseOverlayComponent implements OnInit, OnDestroy {
   // Modal de guardar ejercicio
   showSaveModal = false;
   
+  // Delay entre correcciones (5 segundos)
+  canAcceptPrediction = true;
+  private readonly PREDICTION_DELAY = 5000; // 5 segundos entre correcciones
+  private readonly DISPLAY_TIME = 3000; // 3 segundos para mostrar la corrección
+  
+  // Modal de confirmación para finalizar
+  showFinishConfirm = false;
+  
   private subscriptions: Subscription[] = [];
   private sessionTimer: any;
 
   constructor(
     private wsService: WebSocketService,
-    private dataService: DataService
+    private dataService: DataService,
+    private feedbackService: FeedbackService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -98,8 +111,15 @@ export class ExerciseOverlayComponent implements OnInit, OnDestroy {
 
   /**
    * Maneja una nueva predicción
+   * Implementa un delay de 5 segundos entre correcciones para evitar que lleguen muy rápido
    */
   private handlePrediction(prediction: Prediction): void {
+    // Solo procesar si ha pasado el tiempo mínimo de 5 segundos desde la última corrección
+    if (!this.canAcceptPrediction) {
+      return; // Ignorar predicciones durante el delay
+    }
+
+    // Aceptar la predicción
     this.lastPrediction = prediction;
     this.showPrediction = true;
     
@@ -123,7 +143,13 @@ export class ExerciseOverlayComponent implements OnInit, OnDestroy {
     // Ocultar predicción después de 3 segundos
     setTimeout(() => {
       this.showPrediction = false;
-    }, 3000);
+    }, this.DISPLAY_TIME);
+
+    // Bloquear nuevas predicciones por 5 segundos
+    this.canAcceptPrediction = false;
+    setTimeout(() => {
+      this.canAcceptPrediction = true;
+    }, this.PREDICTION_DELAY);
   }
 
   /**
@@ -283,8 +309,9 @@ export class ExerciseOverlayComponent implements OnInit, OnDestroy {
 
   /**
    * Guarda la sesión completa
+   * Retorna un Observable para permitir suscripción y espera de finalización
    */
-  saveSession(): void {
+  saveSession() {
     if (!this.sessionStartTime) {
       console.warn('No hay sesión activa');
       return;
@@ -306,15 +333,83 @@ export class ExerciseOverlayComponent implements OnInit, OnDestroy {
       }))
     };
 
-    this.dataService.saveSession(sessionData).subscribe({
-      next: (response) => {
-        console.log('✅ Sesión guardada:', response);
-        alert('Sesión guardada exitosamente!');
-      },
-      error: (error) => {
-        console.error('❌ Error al guardar sesión:', error);
-        alert('Error al guardar la sesión.');
-      }
-    });
+    return this.dataService.saveSession(sessionData);
+  }
+
+  /**
+   * Abre el diálogo de confirmación para finalizar la sesión
+   */
+  openFinishDialog(): void {
+    this.showFinishConfirm = true;
+  }
+
+  /**
+   * Cierra el diálogo de confirmación
+   */
+  closeFinishDialog(): void {
+    this.showFinishConfirm = false;
+  }
+
+  /**
+   * Handler para el botón de guardar sesión
+   * Se llama desde el template cuando el usuario hace click
+   */
+  onSaveSessionClick(): void {
+    const saveObservable = this.saveSession();
+    
+    if (saveObservable) {
+      saveObservable.subscribe({
+        next: (response) => {
+          console.log('✅ Sesión guardada:', response);
+          this.feedbackService.success('Sesión guardada exitosamente!');
+        },
+        error: (error) => {
+          console.error('❌ Error al guardar sesión:', error);
+          this.feedbackService.error('Error al guardar la sesión.');
+        }
+      });
+    }
+  }
+
+  /**
+   * Finaliza la sesión y redirige al home
+   * Se ejecuta cuando el usuario confirma en el diálogo
+   */
+  confirmFinishSession(): void {
+    this.showFinishConfirm = false;
+    
+    // Guardar sesión y esperar a que complete
+    const saveObservable = this.saveSession();
+    
+    if (saveObservable) {
+      saveObservable.subscribe({
+        next: (response) => {
+          console.log('✅ Sesión guardada:', response);
+          this.feedbackService.success('¡Sesión finalizada! Regresando al inicio...');
+          
+          // Limpiar recursos
+          if (this.sessionTimer) {
+            clearInterval(this.sessionTimer);
+          }
+          
+          // Redirigir al home después de 1.5 segundos
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 1500);
+        },
+        error: (error) => {
+          console.error('❌ Error al guardar sesión:', error);
+          this.feedbackService.error('Error al finalizar la sesión.');
+          
+          // Aún así redirigir al home después del error
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 1500);
+        }
+      });
+    } else {
+      // Si no hay sesión, redirigir directamente
+      this.router.navigate(['/home']);
+    }
   }
 }

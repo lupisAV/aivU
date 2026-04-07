@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { FeedbackService } from '../services/feedback.service';
+import { LoadingService } from '../services/loading.service';
 
 @Component({
   selector: 'app-login',
@@ -8,10 +10,20 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private feedbackService: FeedbackService,
+    private loadingService: LoadingService
+  ) {}
 
   goToHome() {
-    this.router.navigate(['/home']);
+    this.loadingService.show('Iniciando sesión...');
+    // Simular petición a servidor
+    setTimeout(() => {
+      this.loadingService.hide();
+      this.feedbackService.success('¡Sesión iniciada correctamente!');
+      this.router.navigate(['/home']);
+    }, 1500);
   }
 
   goToRegister() {

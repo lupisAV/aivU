@@ -1,177 +1,189 @@
-<div class="comparison-container">
-  <div class="comparison-header">
-    <h1 class="title">📊 Comparación de Ejercicios</h1>
-    <p class="subtitle">Compara las ondas de movimiento entre dos ejercicios</p>
-    
-    <!-- Botón de Exportar Dataset -->
-    <div class="export-section">
-      <button class="export-button" (click)="exportDataset()" [disabled]="isExporting">
-        @if (isExporting) {
-          <span class="spinner-small"></span>
-          <span>Exportando...</span>
-        } @else {
-          <span>📦</span>
-          <span>Exportar Dataset para Entrenamiento</span>
-        }
-      </button>
-      @if (exportMessage) {
-        <div class="export-message" [class.success]="exportSuccess" [class.error]="!exportSuccess">
-          {{ exportMessage }}
-        </div>
-      }
+<div class="comp-page">
+
+  <!-- HEADER -->
+  <div class="comp-header">
+    <div class="comp-header-text">
+      <h1 class="comp-title">📊 Comparación de Ejercicios</h1>
+      <p class="comp-subtitle">Analiza y compara las trayectorias de movimiento entre dos sesiones capturadas</p>
+    </div>
+
+    <!-- Dataset stats bar -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-value stat-total">0</span>
+        <span class="stat-label">Total guardados</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value stat-correct">0</span>
+        <span class="stat-label">✅ Correctos</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value stat-incorrect">0</span>
+        <span class="stat-label">❌ Incorrectos</span>
+      </div>
     </div>
   </div>
 
-  <!-- Mensaje de carga -->
-  @if (isLoading) {
-    <div class="loading-message">
-      <div class="spinner"></div>
-      <p>Cargando ejercicios...</p>
-    </div>
-  }
-
-  <!-- Mensaje de error -->
+  <!-- Error -->
   @if (errorMessage) {
-    <div class="error-message">
+    <div class="comp-error-banner">
       <span>⚠️</span>
       <p>{{ errorMessage }}</p>
     </div>
   }
 
-  <!-- Selectores de ejercicios -->
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="comp-loading">
+      <div class="comp-spinner"></div>
+      <p>Cargando ejercicios del dataset...</p>
+    </div>
+  }
+
+  <!-- SELECTOR GRID -->
   <div class="selectors-grid">
-    <!-- Selector Ejercicio 1 -->
-    <div class="selector-card">
-      <h3 class="selector-title">Ejercicio 1</h3>
-      <select 
-        class="exercise-select"
-        [(ngModel)]="selectedExercise1"
-        (change)="onExercise1Change()">
-        <option value="">Selecciona un ejercicio...</option>
-        @for (exercise of exercises; track exercise.exercise_id) {
-          <option [value]="exercise.exercise_id">
-            {{ exercise.exercise_type }} - {{ exercise.label_name }} - {{ formatDate(exercise.timestamp) }}
+
+    <!-- Slot A -->
+    <div class="selector-card" [class.has-data]="exercise1Data">
+      <div class="slot-header">
+        <span class="slot-badge slot-a">A</span>
+        <h3 class="slot-title">Ejercicio A</h3>
+        @if (exercise1Data) {
+          <span class="exercise-badge" [style.background]="getLabelBg(exercise1Data.label)" [style.color]="getLabelColor(exercise1Data.label)">
+            {{ exercise1Data.label_name.toUpperCase() }}
+          </span>
+        }
+      </div>
+
+      <select class="comp-select" [(ngModel)]="selectedExercise1" (change)="onExercise1Change()">
+        <option value="">— Selecciona un ejercicio —</option>
+        @for (ex of exercises; track ex.exercise_id) {
+          <option [value]="ex.exercise_id">
+            {{ formatType(ex.exercise_type) }} · {{ ex.label_name }} · {{ formatDate(ex.timestamp) }}
           </option>
         }
       </select>
-      
+
       @if (exercise1Data) {
-        <div class="exercise-info" [style.border-color]="getLabelColor(exercise1Data.label)">
-          <div class="info-row">
-            <span class="info-label">Tipo:</span>
-            <span class="info-value">{{ exercise1Data.exercise_type }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Clasificación:</span>
-            <span class="info-value" [style.color]="getLabelColor(exercise1Data.label)">
-              {{ exercise1Data.label_name.toUpperCase() }}
-            </span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Fecha:</span>
-            <span class="info-value">{{ formatDate(exercise1Data.timestamp) }}</span>
-          </div>
+        <div class="exercise-info-card" [style.border-left-color]="getLabelColor(exercise1Data.label)">
+          <div class="info-row"><span class="info-lbl">Tipo</span><span class="info-val">{{ formatType(exercise1Data.exercise_type) }}</span></div>
+          <div class="info-row"><span class="info-lbl">Usuario</span><span class="info-val">{{ exercise1Data.user_id }}</span></div>
+          <div class="info-row"><span class="info-lbl">Fecha</span><span class="info-val">{{ formatDate(exercise1Data.timestamp) }}</span></div>
         </div>
       }
     </div>
 
-    <!-- Selector Ejercicio 2 -->
-    <div class="selector-card">
-      <h3 class="selector-title">Ejercicio 2</h3>
-      <select 
-        class="exercise-select"
-        [(ngModel)]="selectedExercise2"
-        (change)="onExercise2Change()">
-        <option value="">Selecciona un ejercicio...</option>
-        @for (exercise of exercises; track exercise.exercise_id) {
-          <option [value]="exercise.exercise_id">
-            {{ exercise.exercise_type }} - {{ exercise.label_name }} - {{ formatDate(exercise.timestamp) }}
+    <!-- Similarity score (center) -->
+    @if (exercise1Data && exercise2Data) {
+      <div class="similarity-center">
+        <div class="similarity-ring" [style.border-color]="getSimilarityColor()">
+          <span class="similarity-value" [style.color]="getSimilarityColor()">0%</span>
+          <span class="similarity-label">Similitud</span>
+        </div>
+        <span class="vs-label">VS</span>
+      </div>
+    } @else {
+      <div class="vs-divider"><span class="vs-label">VS</span></div>
+    }
+
+    <!-- Slot B -->
+    <div class="selector-card" [class.has-data]="exercise2Data">
+      <div class="slot-header">
+        <span class="slot-badge slot-b">B</span>
+        <h3 class="slot-title">Ejercicio B</h3>
+        @if (exercise2Data) {
+          <span class="exercise-badge" [style.background]="getLabelBg(exercise2Data.label)" [style.color]="getLabelColor(exercise2Data.label)">
+            {{ exercise2Data.label_name.toUpperCase() }}
+          </span>
+        }
+      </div>
+
+      <select class="comp-select" [(ngModel)]="selectedExercise2" (change)="onExercise2Change()">
+        <option value="">— Selecciona un ejercicio —</option>
+        @for (ex of exercises; track ex.exercise_id) {
+          <option [value]="ex.exercise_id">
+            {{ formatType(ex.exercise_type) }} · {{ ex.label_name }} · {{ formatDate(ex.timestamp) }}
           </option>
         }
       </select>
-      
+
       @if (exercise2Data) {
-        <div class="exercise-info" [style.border-color]="getLabelColor(exercise2Data.label)">
-          <div class="info-row">
-            <span class="info-label">Tipo:</span>
-            <span class="info-value">{{ exercise2Data.exercise_type }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Clasificación:</span>
-            <span class="info-value" [style.color]="getLabelColor(exercise2Data.label)">
-              {{ exercise2Data.label_name.toUpperCase() }}
-            </span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Fecha:</span>
-            <span class="info-value">{{ formatDate(exercise2Data.timestamp) }}</span>
-          </div>
+        <div class="exercise-info-card" [style.border-left-color]="getLabelColor(exercise2Data.label)">
+          <div class="info-row"><span class="info-lbl">Tipo</span><span class="info-val">{{ formatType(exercise2Data.exercise_type) }}</span></div>
+          <div class="info-row"><span class="info-lbl">Usuario</span><span class="info-val">{{ exercise2Data.user_id }}</span></div>
+          <div class="info-row"><span class="info-lbl">Fecha</span><span class="info-val">{{ formatDate(exercise2Data.timestamp) }}</span></div>
         </div>
       }
     </div>
-  </div>
 
-  <!-- Selector de keypoint -->
+  </div><!-- /selectors-grid -->
+
+  <!-- CHART SECTION (visible when both are loaded) -->
   @if (exercise1Data && exercise2Data) {
-    <div class="keypoint-selector">
-      <label class="keypoint-label">Selecciona el punto a visualizar:</label>
-      <select 
-        class="keypoint-select"
-        [(ngModel)]="selectedKeypoint"
-        (change)="onKeypointChange()">
+
+    <!-- Keypoint selector -->
+    <div class="keypoint-bar">
+      <label class="kp-label">🔎 Articulación a visualizar:</label>
+      <select class="kp-select" [(ngModel)]="selectedKeypoint" (change)="onKeypointChange()">
         @for (name of keypointNames; track $index) {
           <option [value]="$index">{{ name }}</option>
         }
       </select>
     </div>
 
-    <!-- Gráfica de ondas -->
-    <div class="chart-container">
+    <!-- Chart wrapper -->
+    <div class="chart-wrapper" #chartWrapper>
       <canvas #waveformCanvas></canvas>
     </div>
 
-    <!-- Leyenda explicativa -->
-    <div class="legend-card">
-      <h3 class="legend-title">💡 Cómo Interpretar la Gráfica</h3>
-      <div class="legend-grid">
-        <div class="legend-item">
-          <div class="legend-icon correct">━━━</div>
-          <div class="legend-text">
-            <strong>Línea Sólida:</strong> Primer ejercicio seleccionado
-          </div>
-        </div>
-        <div class="legend-item">
-          <div class="legend-icon incorrect">┄┄┄</div>
-          <div class="legend-text">
-            <strong>Línea Punteada:</strong> Segundo ejercicio seleccionado
-          </div>
-        </div>
-        <div class="legend-item">
-          <div class="legend-icon" style="background: #10B981;"></div>
-          <div class="legend-text">
-            <strong>Verde:</strong> Ejercicio correcto (movimiento suave y controlado)
-          </div>
-        </div>
-        <div class="legend-item">
-          <div class="legend-icon" style="background: #EF4444;"></div>
-          <div class="legend-text">
-            <strong>Rojo:</strong> Ejercicio incorrecto (movimiento brusco o irregular)
-          </div>
-        </div>
-      </div>
-      <p class="legend-note">
-        <strong>Tip:</strong> Los ejercicios correctos suelen mostrar curvas suaves y continuas, 
-        mientras que los incorrectos tienen picos y valles irregulares.
-      </p>
+    <!-- Legend -->
+    <div class="legend-strip">
+      <div class="legend-item"><span class="legend-line solid"></span><span>Ejercicio A — línea sólida</span></div>
+      <div class="legend-item"><span class="legend-line dashed"></span><span>Ejercicio B — línea punteada</span></div>
+      <div class="legend-item"><span class="legend-dot green"></span><span>Correcto</span></div>
+      <div class="legend-item"><span class="legend-dot red"></span><span>Incorrecto</span></div>
+    </div>
+
+    <!-- Tip card -->
+    <div class="tip-card">
+      <span class="tip-icon">💡</span>
+      <p>Los ejercicios <strong>correctos</strong> muestran curvas suaves y simétricas. Los <strong>incorrectos</strong> presentan picos e irregularidades. Una similitud &gt;70% generalmente indica patrones de movimiento comparables.</p>
     </div>
   }
 
-  <!-- Mensaje cuando no hay ejercicios seleccionados -->
+  <!-- Empty state when none selected -->
   @if (!exercise1Data || !exercise2Data) {
     <div class="empty-state">
       <div class="empty-icon">📈</div>
       <h3>Selecciona dos ejercicios para comparar</h3>
-      <p>Elige dos ejercicios de los selectores de arriba para ver sus gráficas de ondas</p>
+      <p>Elige un ejercicio en cada slot para ver la gráfica de trayectoria y el índice de similitud entre ambos movimientos.</p>
+      @if (exercises.length === 0 && !isLoading) {
+        <div class="no-data-hint">
+          <span>⚠️</span>
+          <p>No hay ejercicios guardados todavía. Usa el botón <strong>"Guardar"</strong> en la pantalla de cámara para empezar a construir tu dataset.</p>
+        </div>
+      }
     </div>
   }
+
+  <!-- ACTIONS BAR -->
+  <div class="actions-bar">
+    <button class="btn-reload" (click)="loadExercises()">🔄 Recargar lista</button>
+    <button class="btn-export" (click)="exportDataset()" [disabled]="isExporting">
+      @if (isExporting) {
+        <span class="btn-spinner"></span> Exportando...
+      } @else {
+        📦 Exportar Dataset para entrenar
+      }
+    </button>
+  </div>
+
+  @if (exportMessage) {
+    <div class="export-toast" [class.success]="exportSuccess" [class.error]="!exportSuccess">
+      {{ exportMessage }}
+    </div>
+  }
+
 </div>

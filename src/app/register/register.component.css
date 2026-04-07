@@ -118,6 +118,23 @@ label {
   font-size: 1.1rem;
 }
 
+.label-text {
+  flex: 1;
+}
+
+.helper-text {
+  display: block;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+  opacity: 0.8;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
 input {
   width: 100%;
   padding: 0.9rem 1rem;

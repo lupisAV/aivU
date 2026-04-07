@@ -113,9 +113,14 @@
         <span>Guardar Ejercicio</span>
       </button>
       
-      <button class="action-button session" (click)="saveSession()" [disabled]="totalReps === 0">
+      <button class="action-button session" (click)="onSaveSessionClick()" [disabled]="totalReps === 0">
         <span>📊</span>
         <span>Guardar Sesión</span>
+      </button>
+      
+      <button class="action-button finish" (click)="openFinishDialog()">
+        <span>🏁</span>
+        <span>Finalizar</span>
       </button>
       
       <button class="action-button reset" (click)="resetCounter()">
@@ -152,3 +157,16 @@
   (close)="closeSaveModal()"
   (save)="saveExercise($event)">
 </app-save-exercise-modal>
+
+<!-- Modal de Confirmación para Finalizar -->
+<app-confirmation-dialog
+  [isOpen]="showFinishConfirm"
+  title="¿Finalizar sesión?"
+  message="¿Deseas finalizar la sesión y regresar al inicio?"
+  detail="Se guardará automáticamente tu progreso."
+  confirmText="Sí, finalizar"
+  cancelText="Continuar entrenando"
+  severity="success"
+  (confirmed)="confirmFinishSession()"
+  (cancelled)="closeFinishDialog()">
+</app-confirmation-dialog>

@@ -1,33 +1,48 @@
+<!-- Global Loader -->
+<app-global-loader></app-global-loader>
+
+<!-- Toast Container -->
+<app-toast-container></app-toast-container>
+
 <!-- Header/Navigation -->
-<header class="header" *ngIf="showNavbar()">
+<header class="header" *ngIf="showNavbar()" role="banner" aria-label="Navegación principal">
   <div class="container">
     <div class="nav-brand">
-      <h1>
-        <span class="brand-icon">🤖</span>
-        aivU
-      </h1>
-      <p class="brand-tagline">AI, Vision, yoU.</p>
+      <a routerLink="/home" class="brand-link" aria-label="aivU - ir a inicio">
+        <h1>
+          <span class="brand-icon" aria-hidden="true">🤖</span>
+          aivU
+        </h1>
+        <p class="brand-tagline">AI, Vision, yoU.</p>
+      </a>
     </div>
-    <nav class="nav-menu">
-      <a routerLink="/home" class="nav-link" routerLinkActive="active">
-        <span class="link-icon">🏠</span>
-        Inicio
+    <nav class="nav-menu" aria-label="Menú de navegación" role="navigation">
+      <a routerLink="/home" class="nav-link" routerLinkActive="active" 
+         aria-current="page" 
+         title="Volver a inicio">
+        <span class="link-icon" aria-hidden="true">🏠</span>
+        <span class="link-text">Inicio</span>
       </a>
-      <a routerLink="/exercise-recommendation" class="nav-link" routerLinkActive="active">
-        <span class="link-icon">💪</span>
-        Ejercicios
+      <a routerLink="/exercise-recommendation" class="nav-link" routerLinkActive="active"
+         title="Ver recomendaciones de ejercicios">
+        <span class="link-icon" aria-hidden="true">💪</span>
+        <span class="link-text">Ejercicios</span>
       </a>
-      <a routerLink="/elbow-pose" class="nav-link" routerLinkActive="active">
-        <span class="link-icon">📹</span>
-        Cámara
+      <a routerLink="/elbow-pose" class="nav-link" routerLinkActive="active"
+         title="Activar cámara para análisis de postura">
+        <span class="link-icon" aria-hidden="true">📹</span>
+        <span class="link-text">Cámara</span>
       </a>
-      <a routerLink="/comparison" class="nav-link" routerLinkActive="active">
-        <span class="link-icon">📊</span>
-        Comparación
+      <a routerLink="/comparison" class="nav-link" routerLinkActive="active"
+         title="Ver comparación de ejercicios">
+        <span class="link-icon" aria-hidden="true">📊</span>
+        <span class="link-text">Comparación</span>
       </a>
-      <a routerLink="/" class="nav-link nav-link-logout">
-        <span class="link-icon">🚪</span>
-        Salir
+      <a routerLink="/" class="nav-link nav-link-logout"
+         title="Cerrar sesión"
+         aria-label="Cerrar sesión y volver a login">
+        <span class="link-icon" aria-hidden="true">🚪</span>
+        <span class="link-text">Salir</span>
       </a>
     </nav>
   </div>

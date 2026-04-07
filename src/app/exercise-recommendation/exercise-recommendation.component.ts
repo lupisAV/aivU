@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import gsap from 'gsap';
 
 interface Exercise {
   name: string;
@@ -42,6 +43,10 @@ export class ExerciseRecommendationComponent {
     physicalLimitations: [],
     customLimitations: ''
   };
+
+  showModal = false;
+  currentRecIndex = 0;
+  activeRecommendations: ExerciseRecommendation[] = [];
 
   availableLimitations = [
     'Dolor de rodilla',
@@ -170,7 +175,6 @@ export class ExerciseRecommendationComponent {
   ];
 
   recommendations: ExerciseRecommendation[] = [];
-  showResults = false;
   bmi = 0;
   bmiCategory = '';
 
@@ -227,12 +231,61 @@ export class ExerciseRecommendationComponent {
       return order[a.category] - order[b.category];
     });
 
-    this.showResults = true;
+    this.activeRecommendations = this.recommendations.filter(r => r.category !== 'not-recommended');
+    if (this.activeRecommendations.length === 0) {
+      // Si no hay recomendadas o precaución, mostrar las no recomendadas para feedback
+      this.activeRecommendations = this.recommendations;
+    }
     
-    // Scroll suave a los resultados
+    this.currentRecIndex = 0;
+    this.showModal = true;
+    
+    // Animaciones GSAP para el modal flotante
     setTimeout(() => {
-      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+      gsap.fromTo('.recommendations-modal', 
+        { y: 50, opacity: 0, scale: 0.9 }, 
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.5)' }
+      );
+    }, 10);
+  }
+
+  nextExercise() {
+    if (this.currentRecIndex < this.activeRecommendations.length - 1) {
+      this.animateSlide(-30, () => {
+        this.currentRecIndex++;
+      });
+    }
+  }
+
+  prevExercise() {
+    if (this.currentRecIndex > 0) {
+      this.animateSlide(30, () => {
+        this.currentRecIndex--;
+      });
+    }
+  }
+
+  animateSlide(xOffset: number, callback: () => void) {
+    gsap.to('.modal-body-content', {
+      x: xOffset, opacity: 0, duration: 0.2,
+      onComplete: () => {
+        callback();
+        gsap.fromTo('.modal-body-content', 
+          { x: -xOffset, opacity: 0 }, 
+          { x: 0, opacity: 1, duration: 0.3 }
+        );
+      }
+    });
+  }
+
+  closeRecommendationModal() {
+    gsap.to('.recommendations-modal', {
+      y: 50, opacity: 0, scale: 0.9, duration: 0.3, ease: 'power3.in',
+      onComplete: () => {
+        this.showModal = false;
+        this.activeRecommendations = [];
+      }
+    });
   }
 
   evaluateExercise(exercise: Exercise, limitations: string[]): ExerciseRecommendation {
@@ -326,19 +379,8 @@ export class ExerciseRecommendationComponent {
       physicalLimitations: [],
       customLimitations: ''
     };
-    this.showResults = false;
+    this.showModal = false;
     this.recommendations = [];
-  }
-
-  getRecommendedExercises(): ExerciseRecommendation[] {
-    return this.recommendations.filter(r => r.category === 'recommended');
-  }
-
-  getCautionExercises(): ExerciseRecommendation[] {
-    return this.recommendations.filter(r => r.category === 'caution');
-  }
-
-  getNotRecommendedExercises(): ExerciseRecommendation[] {
-    return this.recommendations.filter(r => r.category === 'not-recommended');
+    this.activeRecommendations = [];
   }
 }
