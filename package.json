@@ -30,6 +30,8 @@
     "@angular/router": "^20.3.0",
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/pose": "^0.5.1675469404",
+    "chart.js": "^4.5.1",
+    "gsap": "^3.14.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

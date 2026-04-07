@@ -1,37 +1,106 @@
 <div class="auth-page">
-  <div class="auth-card">
-    <h1 class="brand">AI-Powered Fitness</h1>
-    <h2>Crea tu cuenta</h2>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="brand-header">
+        <h1 class="brand">
+          <span class="brand-icon">🤖</span>
+          aivU
+        </h1>
+        <p class="brand-tagline">AI, Vision, yoU.</p>
+      </div>
+      
+      <h2 class="auth-title">Crear Cuenta</h2>
+      <p class="auth-subtitle">Únete y comienza tu transformación</p>
 
-    <div class="form-group">
-      <label>Nombre completo</label>
-      <input type="text" placeholder="Tu nombre completo" />
+      <div class="form-group">
+        <label for="fullname" aria-required="true">
+          <span class="label-icon" aria-hidden="true">👤</span>
+          <span class="label-text">Nombre Completo</span>
+        </label>
+        <input 
+          id="fullname"
+          type="text" 
+          placeholder="Tu nombre completo" 
+          required
+          aria-label="Nombre completo"
+          aria-describedby="fullname-help" />
+        <span id="fullname-help" class="helper-text">Por favor, ingresa tu nombre y apellido</span>
+      </div>
+
+      <div class="form-group">
+        <label for="email-signup" aria-required="true">
+          <span class="label-icon" aria-hidden="true">📧</span>
+          <span class="label-text">Correo Electrónico</span>
+        </label>
+        <input 
+          id="email-signup"
+          type="email" 
+          placeholder="tu@correo.com" 
+          required
+          aria-label="Correo electrónico"
+          aria-describedby="email-signup-help" />
+        <span id="email-signup-help" class="helper-text">Usaremos esto para tu cuenta</span>
+      </div>
+
+      <div class="form-group">
+        <label for="password-signup" aria-required="true">
+          <span class="label-icon" aria-hidden="true">🔒</span>
+          <span class="label-text">Contraseña</span>
+        </label>
+        <input 
+          id="password-signup"
+          type="password" 
+          placeholder="••••••••" 
+          required
+          aria-label="Contraseña"
+          aria-describedby="password-signup-help" />
+        <span id="password-signup-help" class="helper-text">Mínimo 6 caracteres</span>
+      </div>
+
+      <div class="form-group">
+        <label for="password-confirm" aria-required="true">
+          <span class="label-icon" aria-hidden="true">✓</span>
+          <span class="label-text">Confirmar Contraseña</span>
+        </label>
+        <input 
+          id="password-confirm"
+          type="password" 
+          placeholder="••••••••" 
+          required
+          aria-label="Confirmar contraseña"
+          aria-describedby="password-confirm-help" />
+        <span id="password-confirm-help" class="helper-text">Debe coincidir con la contraseña anterior</span>
+      </div>
+
+      <button 
+        type="button"
+        class="btn primary" 
+        (click)="goToHome()"
+        aria-label="Crear mi cuenta y comenzar">
+        <span class="btn-icon" aria-hidden="true">✨</span>
+        <span class="btn-text">Crear Cuenta</span>
+      </button>
+
+      <div class="divider" aria-hidden="true">
+        <span>o</span>
+      </div>
+
+      <p class="signup-link">
+        ¿Ya tienes cuenta?
+        <a role="button" (click)="goToLogin()" aria-label="Ir a iniciar sesión">Inicia sesión</a>
+      </p>
     </div>
 
-    <div class="form-group">
-      <label>Email</label>
-      <input type="text" placeholder="tu@correo.com" />
+    <div class="auth-illustration" aria-hidden="true">
+      <div class="illustration-content">
+        <div class="floating-icon icon-1">🎯</div>
+        <div class="floating-icon icon-2">💪</div>
+        <div class="floating-icon icon-3">🚀</div>
+        <div class="illustration-text">
+          <h3>Comienza Hoy</h3>
+          <p>Tu viaje hacia una mejor postura y salud comienza aquí</p>
+        </div>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label>Contraseña</label>
-      <input type="password" placeholder="••••••••" />
-    </div>
-
-    <div class="form-group">
-      <label>Confirmar contraseña</label>
-      <input type="password" placeholder="••••••••" />
-    </div>
-
-    <button class="btn primary" (click)="goToHome()">Registrarse</button>
-
-    <p class="small">
-      ¿Ya tienes cuenta?
-      <a (click)="goToLogin()">Inicia sesión</a>
-    </p>
-  </div>
-
-  <div class="auth-illustration">
-    <img src="assets/illustration-register.png" alt="AI register" />
   </div>
 </div>

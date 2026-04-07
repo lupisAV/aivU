@@ -1,0 +1,200 @@
+<div class="exercise-recommendation-container">
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-content">
+      <h1 class="title">
+        <span class="icon">💪</span>
+        Recomendador de Ejercicios
+      </h1>
+      <p class="subtitle">
+        Obtén recomendaciones personalizadas basadas en tu perfil físico y limitaciones
+      </p>
+    </div>
+  </header>
+
+  <!-- Form Section -->
+  <section class="form-section">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Completa tu Perfil</h2>
+        <p>Proporciona tu información para generar recomendaciones precisas</p>
+      </div>
+
+      <form class="profile-form">
+        <!-- Datos Básicos -->
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="weight">
+              <span class="label-icon">⚖️</span>
+              Peso (kg)
+            </label>
+            <input
+              type="number"
+              id="weight"
+              [(ngModel)]="userProfile.weight"
+              name="weight"
+              placeholder="Ej: 70"
+              min="1"
+              max="300"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="height">
+              <span class="label-icon">📏</span>
+              Altura (cm)
+            </label>
+            <input
+              type="number"
+              id="height"
+              [(ngModel)]="userProfile.height"
+              name="height"
+              placeholder="Ej: 170"
+              min="1"
+              max="250"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="age">
+              <span class="label-icon">🎂</span>
+              Edad (años)
+            </label>
+            <input
+              type="number"
+              id="age"
+              [(ngModel)]="userProfile.age"
+              name="age"
+              placeholder="Ej: 30"
+              min="1"
+              max="120"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Limitaciones Físicas -->
+        <div class="form-group">
+          <label class="section-label">
+            <span class="label-icon">🏥</span>
+            Limitaciones Físicas o Lesiones
+          </label>
+          <p class="helper-text">Selecciona todas las que apliquen</p>
+          
+          <div class="limitations-grid">
+            <div
+              *ngFor="let limitation of availableLimitations"
+              class="limitation-chip"
+              [class.selected]="isLimitationSelected(limitation)"
+              (click)="toggleLimitation(limitation)"
+            >
+              <span class="chip-icon">{{ isLimitationSelected(limitation) ? '✓' : '+' }}</span>
+              {{ limitation }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Limitaciones Personalizadas -->
+        <div class="form-group">
+          <label for="customLimitations">
+            <span class="label-icon">✍️</span>
+            Otras Limitaciones (Opcional)
+          </label>
+          <textarea
+            id="customLimitations"
+            [(ngModel)]="userProfile.customLimitations"
+            name="customLimitations"
+            placeholder="Describe cualquier otra condición o limitación que debamos considerar..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="generateRecommendations()">
+            <span class="btn-icon">🎯</span>
+            Generar Recomendaciones
+          </button>
+          <button type="button" class="btn-secondary" (click)="resetForm()">
+            Limpiar Formulario
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Modal de Recomendaciones -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeRecommendationModal()">
+    <div class="modal-content recommendations-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeRecommendationModal()">×</button>
+      
+      <div *ngIf="activeRecommendations.length > 0; else noData">
+        <div class="modal-header" [ngClass]="activeRecommendations[currentRecIndex].category">
+          <div class="carousel-controls-top" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
+             <span class="step-indicator">Recomendación {{ currentRecIndex + 1 }} de {{ activeRecommendations.length }}</span>
+          </div>
+          <h3>{{ activeRecommendations[currentRecIndex].exercise.name }}</h3>
+          <span class="difficulty-badge" [class]="activeRecommendations[currentRecIndex].exercise.difficulty">
+            {{ activeRecommendations[currentRecIndex].exercise.difficulty === 'beginner' ? 'Principiante' : 
+               activeRecommendations[currentRecIndex].exercise.difficulty === 'intermediate' ? 'Intermedio' : 'Avanzado' }}
+          </span>
+        </div>
+        
+        <div class="modal-body modal-body-content">
+          <p class="modal-description">{{ activeRecommendations[currentRecIndex].exercise.description }}</p>
+          
+          <div class="modal-section reason-section" [ngClass]="activeRecommendations[currentRecIndex].category">
+            <h4><span class="icon">ℹ️</span> Evaluación para ti</h4>
+            <p>{{ activeRecommendations[currentRecIndex].reason }}</p>
+          </div>
+
+          <div class="modal-grid">
+            <div class="modal-section">
+              <h4><span class="icon">✨</span> Beneficios</h4>
+              <ul>
+                <li *ngFor="let benefit of activeRecommendations[currentRecIndex].exercise.benefits">{{ benefit }}</li>
+              </ul>
+            </div>
+
+            <div class="modal-section" *ngIf="activeRecommendations[currentRecIndex].exercise.contraindications.length > 0">
+              <h4><span class="icon">⚠️</span> Riesgos y Limitaciones</h4>
+              <ul class="risks-list">
+                <li *ngFor="let contra of activeRecommendations[currentRecIndex].exercise.contraindications">{{ contra }}</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <h4><span class="icon">💪</span> Grupos Musculares</h4>
+            <div class="muscle-groups">
+              <span class="muscle-tag" *ngFor="let muscle of activeRecommendations[currentRecIndex].exercise.muscleGroups">
+                {{ muscle }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer carousel-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <button class="btn-secondary btn-icon-only" (click)="prevExercise()" [disabled]="currentRecIndex === 0" style="min-width: unset; padding: 0.8rem 1.2rem;">
+            ◀ Anterior
+          </button>
+          <a routerLink="/elbow-pose" class="btn-primary" style="text-decoration: none;">
+            Entrenar
+          </a>
+          <button class="btn-secondary btn-icon-only" (click)="nextExercise()" [disabled]="currentRecIndex === activeRecommendations.length - 1" style="min-width: unset; padding: 0.8rem 1.2rem;">
+            Siguiente ▶
+          </button>
+        </div>
+      </div>
+
+      <ng-template #noData>
+         <div class="modal-body" style="text-align:center; padding: 4rem 2rem;">
+            <h3>No hay recomendaciones viables</h3>
+            <p style="color: var(--text-muted); margin-top: 1rem;">Por favor, ajusta tus limitaciones o consulta a un médico.</p>
+         </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -1,3 +1,22 @@
+/* Importar tipografías */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Variables de color */
+:root {
+  --bg-primary: #0D0D14;
+  --bg-card: #13131F;
+  --bg-elevated: #1A1A2E;
+  --accent-violet: #7B2FD6;
+  --accent-violet-light: #9B59FF;
+  --accent-violet-border: #5A1FA8;
+  --status-green: #22C55E;
+  --status-yellow: #EAB308;
+  --status-red: #EF4444;
+  --text-primary: #F1F1FF;
+  --text-muted: #6B6B8A;
+  --timer-bg: #1E1B30;
+}
+
 /* Reset y estilos globales */
 * {
   margin: 0;
@@ -7,10 +26,18 @@
 
 html, body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #1a1c20;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
 }
 
 /* Utilidades globales */
@@ -21,12 +48,128 @@ html, body {
   padding: 0 20px;
 }
 
+/* Tipografía Display */
+.display-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.display-heading {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.body-text {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+}
+
+.body-text-bold {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+}
+
+.mono-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+}
+
 /* Animaciones globales */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ctaPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(123, 47, 214, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(123, 47, 214, 0);
+  }
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.6;
+  }
+}
+
+@keyframes donutStroke {
+  from {
+    stroke-dashoffset: 283;
+  }
+  to {
+    stroke-dashoffset: 43;
+  }
+}
+
 .fade-in {
   animation: fadeIn 0.3s ease-in;
+}
+
+/* Glassmorphism */
+.card-glass {
+  background: rgba(19, 19, 31, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(123, 47, 214, 0.2);
+}
+
+/* Glow Effects */
+.active-glow {
+  box-shadow: 0 0 0 1px var(--accent-violet),
+              0 0 16px rgba(123, 47, 214, 0.35),
+              0 0 32px rgba(123, 47, 214, 0.15);
+}
+
+.glow-sm {
+  box-shadow: 0 0 12px rgba(123, 47, 214, 0.25);
+}
+
+.glow-md {
+  box-shadow: 0 0 20px rgba(123, 47, 214, 0.35);
+}
+
+.glow-lg {
+  box-shadow: 0 0 32px rgba(123, 47, 214, 0.45);
 }

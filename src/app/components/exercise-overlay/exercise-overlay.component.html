@@ -1,0 +1,172 @@
+<div class="overlay-container">
+  <!-- Indicador de Conexión -->
+  <div class="connection-status" [class.connected]="isConnected">
+    <div class="status-dot"></div>
+    <span>{{ isConnected ? 'Conectado' : 'Desconectado' }}</span>
+  </div>
+
+  <!-- Barra de Progreso del Buffer -->
+  <div class="buffer-section" *ngIf="isConnected">
+    <div class="buffer-header">
+      <span class="buffer-label">Buffer</span>
+      <span class="buffer-count">{{ bufferSize }}/{{ bufferMax }}</span>
+    </div>
+    <div class="buffer-bar">
+      <div 
+        class="buffer-fill" 
+        [style.width.%]="bufferProgress"
+        [class.ready]="isBufferReady">
+      </div>
+    </div>
+  </div>
+
+  <!-- Predicción Actual -->
+  <div class="prediction-card" *ngIf="showPrediction && lastPrediction" 
+       [@slideIn]
+       [style.border-color]="getClassificationColor()">
+    <div class="prediction-header">
+      <div class="prediction-icon" [style.background-color]="getClassificationColor()">
+        {{ getClassificationIcon() }}
+      </div>
+      <div class="prediction-info">
+        <h3 class="prediction-title">
+          {{ lastPrediction.classification === 'correcto' ? 'Correcto' : 'Incorrecto' }}
+        </h3>
+        <p class="prediction-message">{{ getFeedbackMessage() }}</p>
+      </div>
+    </div>
+    
+    <div class="confidence-section">
+      <div class="confidence-label">
+        <span>Confianza</span>
+        <span class="confidence-value">{{ (lastPrediction.confidence * 100).toFixed(1) }}%</span>
+      </div>
+      <div class="confidence-bar">
+        <div 
+          class="confidence-fill" 
+          [style.width.%]="lastPrediction.confidence * 100"
+          [style.background-color]="getClassificationColor()">
+        </div>
+      </div>
+    </div>
+
+    <div class="probabilities">
+      <div class="probability-item">
+        <span class="prob-label">Correcto</span>
+        <span class="prob-value">{{ (lastPrediction.probabilities.correcto * 100).toFixed(1) }}%</span>
+      </div>
+      <div class="probability-item">
+        <span class="prob-label">Incorrecto</span>
+        <span class="prob-value">{{ (lastPrediction.probabilities.incorrecto * 100).toFixed(1) }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contador de Repeticiones -->
+  <div class="stats-card">
+    <h3 class="stats-title">Estadísticas de Sesión</h3>
+    
+    <div class="reps-counter">
+      <div class="rep-item correct">
+        <div class="rep-icon">✓</div>
+        <div class="rep-info">
+          <span class="rep-count">{{ correctReps }}</span>
+          <span class="rep-label">Correctas</span>
+        </div>
+      </div>
+      
+      <div class="rep-item incorrect">
+        <div class="rep-icon">✗</div>
+        <div class="rep-info">
+          <span class="rep-count">{{ incorrectReps }}</span>
+          <span class="rep-label">Incorrectas</span>
+        </div>
+      </div>
+      
+      <div class="rep-item total">
+        <div class="rep-icon">#</div>
+        <div class="rep-info">
+          <span class="rep-count">{{ totalReps }}</span>
+          <span class="rep-label">Total</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="session-stats">
+      <div class="stat-item">
+        <span class="stat-label">Tasa de Éxito</span>
+        <span class="stat-value">{{ getSuccessRate() }}%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Confianza Promedio</span>
+        <span class="stat-value">{{ (averageConfidence * 100).toFixed(1) }}%</span>
+      </div>
+      <div class="stat-item" *ngIf="sessionStartTime">
+        <span class="stat-label">Duración</span>
+        <span class="stat-value">{{ formatDuration() }}</span>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-button save" (click)="openSaveModal()" [disabled]="!currentSequence">
+        <span>💾</span>
+        <span>Guardar Ejercicio</span>
+      </button>
+      
+      <button class="action-button session" (click)="onSaveSessionClick()" [disabled]="totalReps === 0">
+        <span>📊</span>
+        <span>Guardar Sesión</span>
+      </button>
+      
+      <button class="action-button finish" (click)="openFinishDialog()">
+        <span>🏁</span>
+        <span>Finalizar</span>
+      </button>
+      
+      <button class="action-button reset" (click)="resetCounter()">
+        <span>🔄</span>
+        <span>Resetear</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Historial de Predicciones -->
+  <div class="history-card" *ngIf="predictionHistory.length > 0">
+    <h3 class="history-title">Últimas Predicciones</h3>
+    <div class="history-list">
+      <div 
+        class="history-item" 
+        *ngFor="let pred of predictionHistory.slice().reverse(); let i = index"
+        [class.correct]="pred.classification === 'correcto'"
+        [class.incorrect]="pred.classification === 'incorrecto'">
+        <span class="history-index">#{{ predictionHistory.length - i }}</span>
+        <span class="history-classification">
+          {{ pred.classification === 'correcto' ? '✓' : '✗' }}
+        </span>
+        <span class="history-confidence">
+          {{ (pred.confidence * 100).toFixed(0) }}%
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Guardar Ejercicio -->
+<app-save-exercise-modal
+  [isOpen]="showSaveModal"
+  (close)="closeSaveModal()"
+  (save)="saveExercise($event)">
+</app-save-exercise-modal>
+
+<!-- Modal de Confirmación para Finalizar -->
+<app-confirmation-dialog
+  [isOpen]="showFinishConfirm"
+  title="¿Finalizar sesión?"
+  message="¿Deseas finalizar la sesión y regresar al inicio?"
+  detail="Se guardará automáticamente tu progreso."
+  confirmText="Sí, finalizar"
+  cancelText="Continuar entrenando"
+  severity="success"
+  (confirmed)="confirmFinishSession()"
+  (cancelled)="closeFinishDialog()">
+</app-confirmation-dialog>

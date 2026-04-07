@@ -1,0 +1,217 @@
+<!-- HEADER: Selector de Ejercicio Personalizable -->
+<div class="exercise-header">
+  <div class="header-content">
+
+    <!-- Exercise chips -->
+    <div class="exercise-chips">
+      <span class="chips-label">🏋️ Ejercicio:</span>
+      <button
+        *ngFor="let ex of exercises; let i = index"
+        class="exercise-chip"
+        [class.active]="selectedIndex === i"
+        (click)="selectExercise(i)">
+        {{ ex.name }}
+      </button>
+    </div>
+
+    <!-- Editable params for selected exercise -->
+    <div class="exercise-params">
+      <label class="param-label">
+        Reps objetivo
+        <input
+          type="number"
+          class="param-input"
+          [(ngModel)]="selectedExercise.reps"
+          min="1" max="100"
+          title="Repeticiones objetivo">
+      </label>
+      <label class="param-label">
+        Duración (s)
+        <input
+          type="number"
+          class="param-input"
+          [(ngModel)]="selectedExercise.duration"
+          min="10" max="600"
+          title="Duración en segundos">
+      </label>
+    </div>
+
+    <div class="header-controls">
+      <div class="current-exercise-info">
+        <span class="label">Seleccionado:</span>
+        <span class="value">{{ selectedExercise.name }}</span>
+      </div>
+      <button
+        class="btn-camera-primary"
+        [class.active]="isActive"
+        [disabled]="isLoading"
+        (click)="toggleExercise()">
+        {{ isActive ? '⏸ Pausar' : '▶️ Iniciar' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div class="camera-container">
+  <!-- PANEL IZQUIERDO: Video Grande (65%) -->
+  <div class="camera-panel">
+    <!-- Video Container con Canvas superpuesto -->
+    <div class="video-container">
+      <!-- Mensaje de Carga -->
+      <div class="loading-overlay" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Inicializando cámara...</p>
+      </div>
+
+      <!-- Mensaje de Error -->
+      <div class="error-toast" *ngIf="showError">
+        <div class="error-icon">⚠️</div>
+        <p class="error-text">{{ errorMessage }}</p>
+      </div>
+
+      <!-- Video y Canvas (MediaPipe) -->
+      <video 
+        #videoElement 
+        class="video-element"
+        autoplay 
+        playsinline>
+      </video>
+      
+      <canvas 
+        #canvasElement 
+        class="canvas-element"
+        width="1280" 
+        height="720">
+      </canvas>
+
+      <!-- Overlay de Instrucciones -->
+      <div class="instructions-overlay" *ngIf="!isActive">
+        <div class="instructions-content">
+          <h2 class="instructions-title">¿Listo para entrenar?</h2>
+          <p class="instructions-text">
+            Posiciónate frente a la cámara y asegúrate de que tus brazos sean visibles.
+          </p>
+          <ul class="instructions-list">
+            <li>Buena iluminación</li>
+            <li>Fondo despejado</li>
+            <li>Brazos completamente visibles</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Indicador de Grabación -->
+      <div class="recording-indicator" *ngIf="isActive">
+        <div class="recording-dot"></div>
+        <span>Analizando</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL CENTRAL: Monitor Detallado -->
+  <div class="monitor-panel">
+    <div class="realtime-monitor">
+      <h3 class="monitor-title">📊 Monitor en Tiempo Real</h3>
+
+      <!-- Métricas Principales en Grid -->
+      <div class="metrics-grid">
+        <!-- Precisión -->
+        <div class="metric-card metric-precision">
+          <div class="metric-icon">🎯</div>
+          <div class="metric-content">
+            <span class="metric-label">Precisión</span>
+            <span class="metric-value">{{ precisionValue }}</span>
+          </div>
+        </div>
+
+        <!-- Repeticiones -->
+        <div class="metric-card metric-reps">
+          <div class="metric-icon">🔄</div>
+          <div class="metric-content">
+            <span class="metric-label">Reps</span>
+            <span class="metric-value">{{ repsCount }} / {{ selectedExercise.reps }}</span>
+          </div>
+        </div>
+
+        <!-- Tiempo -->
+        <div class="metric-card metric-time">
+          <div class="metric-icon">⏱️</div>
+          <div class="metric-content">
+            <span class="metric-label">Tiempo</span>
+            <span class="metric-value">{{ sessionTimeDisplay }}</span>
+          </div>
+        </div>
+
+        <!-- Cadencia -->
+        <div class="metric-card metric-cadence">
+          <div class="metric-icon">💨</div>
+          <div class="metric-content">
+            <span class="metric-label">Cadencia</span>
+            <span class="metric-value">{{ cadenceDisplay }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skeleton Viewer - Postura en Tiempo Real -->
+      <div class="skeleton-section">
+        <h4 class="section-subtitle">Postura Detectada</h4>
+        <div class="skeleton-viewer">
+          <svg class="skeleton-svg" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="skeleton-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- SKELETON JOINTS -->
+            <circle id="joint-head" cx="100" cy="50" r="15" class="joint joint-head" fill="#7B2FD6" opacity="0.8" filter="url(#skeleton-glow)"/>
+            <circle id="joint-left-shoulder" cx="70" cy="100" r="10" class="joint joint-shoulder" fill="#9B59FF"/>
+            <circle id="joint-right-shoulder" cx="130" cy="100" r="10" class="joint joint-shoulder" fill="#9B59FF"/>
+            <circle id="joint-left-elbow" cx="50" cy="180" r="10" class="joint joint-elbow" fill="#22C55E"/>
+            <circle id="joint-right-elbow" cx="150" cy="180" r="10" class="joint joint-elbow" fill="#22C55E"/>
+            <circle id="joint-left-wrist" cx="40" cy="280" r="8" class="joint joint-wrist" fill="#22C55E" opacity="0.7"/>
+            <circle id="joint-right-wrist" cx="160" cy="280" r="8" class="joint joint-wrist" fill="#22C55E" opacity="0.7"/>
+
+            <!-- CONNECTIONS -->
+            <line id="line-left-shoulder-elbow" x1="70" y1="100" x2="50" y2="180" stroke="#9B59FF" stroke-width="2" opacity="0.6" class="joint-line"/>
+            <line id="line-left-elbow-wrist" x1="50" y1="180" x2="40" y2="280" stroke="#22C55E" stroke-width="2" opacity="0.6" class="joint-line"/>
+            <line id="line-right-shoulder-elbow" x1="130" y1="100" x2="150" y2="180" stroke="#9B59FF" stroke-width="2" opacity="0.6" class="joint-line"/>
+            <line id="line-right-elbow-wrist" x1="150" y1="180" x2="160" y2="280" stroke="#22C55E" stroke-width="2" opacity="0.6" class="joint-line"/>
+            <line id="line-shoulders" x1="70" y1="100" x2="130" y2="100" stroke="#7B2FD6" stroke-width="2" opacity="0.5" class="joint-line"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Ángulos de Brazos en Tiempo Real -->
+      <div class="angles-section">
+        <h4 class="section-subtitle">Ángulos Detectados</h4>
+        <div class="angles-grid">
+          <div class="angle-item">
+            <span class="angle-label">Codo Izq</span>
+            <span class="angle-value">125°</span>
+            <div class="angle-bar">
+              <div class="angle-fill" style="width: 65%"></div>
+            </div>
+          </div>
+          <div class="angle-item">
+            <span class="angle-label">Codo Der</span>
+            <span class="angle-value">120°</span>
+            <div class="angle-bar">
+              <div class="angle-fill" style="width: 62%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO: Overlay de Ejercicio con Correcciones -->
+  <app-exercise-overlay
+    [currentSequence]="frameBuffer">
+  </app-exercise-overlay>
+
+</div>
