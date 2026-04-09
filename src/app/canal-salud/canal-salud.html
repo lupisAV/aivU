@@ -1,0 +1,166 @@
+<section class="canal-salud-hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">🏥 Solicita una cita con un fisioterapeuta</h1>
+      <p class="hero-subtitle">Complementa tu entrenamiento con atención profesional personalizada. Mejora tu postura con expertos certificados en nuestro Canal Salud.</p>
+      <div class="stats-grid">
+        <div class="stat">
+          <span class="stat-number">50+</span>
+          <span>Fisioterapeutas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">98%</span>
+          <span>Satisfacción</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">24h</span>
+          <span>Respuesta</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TABS NAVIGATION -->
+<section class="tabs-section">
+  <div class="container">
+    <div class="tabs-nav" role="tablist">
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab() === 'solicitar'"
+        (click)="setTab('solicitar')"
+        role="tab"
+        aria-selected="currentTab() === 'solicitar'">
+        📅 Solicitar Cita
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab() === 'mis-citas'"
+        (click)="setTab('mis-citas')"
+        role="tab"
+        aria-selected="currentTab() === 'mis-citas'">
+        📋 Ver Mis Citas
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab() === 'fisioterapeutas'"
+        (click)="setTab('fisioterapeutas')"
+        role="tab"
+        aria-selected="currentTab() === 'fisioterapeutas'">
+        👨‍⚕️ Fisioterapeutas
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- TAB CONTENT -->
+<div class="tab-content" [ngSwitch]="currentTab()">
+  
+  <!-- SOLICITAR CITA -->
+  <section class="tab-panel" *ngSwitchCase="'solicitar'" role="tabpanel">
+    <div class="container">
+      <div class="booking-grid">
+        <!-- CALENDAR -->
+        <div class="calendar-card">
+          <h3>Selecciona una fecha</h3>
+          <div class="calendar-header">
+            <button class="nav-btn" (click)="prevMonth()">‹</button>
+            <span class="month-year">{{ getMonthYear() }}</span>
+            <button class="nav-btn" (click)="nextMonth()">›</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="day-header" *ngFor="let day of ['D','L','M','X','J','V','S']">{{day}}</div>
+            <button 
+              class="calendar-day" 
+              *ngFor="let day of getCurrentMonthDays()"
+              [class.selected]="selectedDate()?.toDateString() === day?.toDateString()"
+              [class.booked]="day && isBooked(day)"
+              [class.past]="day && isPast(day)"
+              (click)="day && !isPast(day) && selectDate(day)"
+              [disabled]="!day || isPast(day)">
+              {{ day?.getDate() || '' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- BOOKING FORM -->
+        <div class="form-card" *ngIf="selectedDate()">
+          <h3>Reserva tu cita</h3>
+          <form (ngSubmit)="bookAppointment()">
+            <div class="form-group">
+              <label>Hora:</label>
+              <select [(ngModel)]="selectedTime" name="time" required>
+                <option value="">Selecciona hora</option>
+                <option value="09:00">09:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="15:00">03:00 PM</option>
+                <option value="16:00">04:00 PM</option>
+                <option value="17:00">05:00 PM</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Fisioterapeuta:</label>
+              <select [(ngModel)]="selectedTherapist" name="therapist" required>
+                <option value="">Selecciona profesional</option>
+                <option *ngFor="let t of therapists" [value]="t.name">{{ t.name }} - {{ t.specialty }}</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary btn-full" [disabled]="!selectedTime || !selectedTherapist">
+              Reservar Cita
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VER MIS CITAS -->
+  <section class="tab-panel" *ngSwitchCase="'mis-citas'" role="tabpanel">
+    <div class="container">
+      <h3>Mis citas reservadas</h3>
+      <div class="appointments-grid" *ngIf="bookings().length; else noBookings">
+        <div class="appointment-card" *ngFor="let booking of bookings()">
+          <div class="apt-header">
+            <span class="apt-date">{{ booking.date | date:'shortDate' }}</span>
+            <span class="apt-time">{{ booking.time }}</span>
+          </div>
+          <div class="apt-body">
+            <h4>{{ booking.therapist }}</h4>
+            <span class="apt-status" [class]="booking.status">{{ booking.status.toUpperCase() }}</span>
+          </div>
+          <button class="btn-cancel" (click)="cancelBooking(booking.id)">Cancelar</button>
+        </div>
+      </div>
+      <ng-template #noBookings>
+        <div class="empty-state">
+          <span>📋</span>
+          <p>No tienes citas reservadas. ¡Agenda tu primera cita!</p>
+          <button class="btn-primary" (click)="setTab('solicitar')">Reservar Ahora</button>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- FISIO TERAPEUTAS -->
+  <section class="tab-panel" *ngSwitchCase="'fisioterapeutas'" role="tabpanel">
+    <div class="container">
+      <h3>Nuestros Fisioterapeutas</h3>
+      <div class="therapists-grid">
+        <div class="therapist-card" *ngFor="let therapist of therapists">
+          <div class="therapist-image">
+            <img [src]="therapist.image" [alt]="therapist.name" />
+            <div class="therapist-badge">{{ therapist.specialty }}</div>
+          </div>
+          <div class="therapist-info">
+            <h4>{{ therapist.name }}</h4>
+            <p>{{ therapist.bio }}</p>
+            <button class="btn-secondary">Reservar con {{ therapist.name.split(' ')[0] }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
