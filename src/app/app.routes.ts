@@ -19,6 +19,8 @@ export const routes: Routes = [
   
   { path: 'comparison', loadComponent: () => import('./components/comparison/comparison.component').then(m => m.ComparisonComponent) },
 
+  { path: 'canal-salud', loadComponent: () => import('./canal-salud/canal-salud.component').then(m => m.CanalSaludComponent) },
+
   
   { path: '**', redirectTo: '' }
 ];
