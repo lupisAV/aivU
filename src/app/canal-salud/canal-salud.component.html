@@ -1,0 +1,202 @@
+<div class="cs-container">
+  <!-- Header -->
+  <div class="cs-header">
+    <h1 class="cs-title">
+      <span class="cs-title-icon" aria-hidden="true">🏥</span>
+      Canal Salud
+    </h1>
+    <p class="cs-subtitle">
+      Conecta con fisioterapeutas especializados para el seguimiento profesional de tu rutina de ejercicios
+    </p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="cs-main">
+    <!-- Columna izquierda: Fisioterapeutas -->
+    <div class="cs-left-column">
+      <h2 class="cs-section-title">
+        <span class="section-icon" aria-hidden="true">👨‍⚕️</span>
+        Fisioterapeutas Disponibles
+      </h2>
+
+      <div class="cs-therapists-list">
+        <div
+          *ngFor="let therapist of physiotherapists"
+          class="cs-therapist-card"
+          [class.selected]="selectedTherapist?.id === therapist.id"
+          (click)="selectTherapist(therapist)"
+        >
+          <div class="cs-therapist-avatar">{{ therapist.emoji }}</div>
+          <div class="cs-therapist-info">
+            <h3 class="cs-therapist-name">{{ therapist.name }}</h3>
+            <p class="cs-therapist-specialty">{{ therapist.specialty }}</p>
+            <p class="cs-therapist-experience">{{ therapist.experience }} de experiencia</p>
+            <p class="cs-therapist-description">{{ therapist.description }}</p>
+          </div>
+          <div class="cs-therapist-select-indicator" *ngIf="selectedTherapist?.id === therapist.id">
+            ✓
+          </div>
+          <button
+            class="cs-btn-schedule"
+            (click)="openAppointmentModal(therapist); $event.stopPropagation()"
+          >
+            Agendar Cita
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: Calendario + Citas -->
+    <div class="cs-right-column">
+      <div class="cs-calendar-panel">
+        <div class="cs-calendar-header">
+          <button class="cs-calendar-nav" (click)="navigateMonth(-1)" aria-label="Mes anterior">◀</button>
+          <h3 class="cs-calendar-month">{{ monthYearLabel() }}</h3>
+          <button class="cs-calendar-nav" (click)="navigateMonth(1)" aria-label="Mes siguiente">▶</button>
+        </div>
+
+        <div class="cs-calendar-grid">
+          <div class="cs-weekday" *ngFor="let wd of weekDays">{{ wd }}</div>
+          <div
+            *ngFor="let cell of calendarDays"
+            class="cs-calendar-day"
+            [class.other-month]="!cell.isCurrentMonth"
+            [class.today]="cell.isToday"
+            [class.has-appointment]="cell.hasAppointment"
+          >
+            <span class="cs-day-number">{{ cell.day }}</span>
+            <span class="cs-dot" *ngIf="cell.hasAppointment"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Citas Agendadas -->
+      <div class="cs-appointments-list">
+        <h2 class="cs-section-title">
+          <span class="section-icon" aria-hidden="true">📋</span>
+          Próximas Citas
+        </h2>
+
+        <div *ngIf="getUpcomingAppointments().length === 0" class="cs-no-appointments">
+          <span class="cs-no-appointments-icon">📭</span>
+          <p>No tienes citas agendadas</p>
+          <p class="cs-no-appointments-hint">Selecciona un fisioterapeuta y agenda tu primera cita</p>
+        </div>
+
+        <div
+          *ngFor="let apt of getUpcomingAppointments()"
+          class="cs-appointment-item"
+        >
+          <div class="cs-appointment-emoji">{{ apt.therapistEmoji }}</div>
+          <div class="cs-appointment-info">
+            <p class="cs-appointment-date">
+              {{ formatDateSpan(apt.date) }} — {{ apt.time }}
+            </p>
+            <p class="cs-appointment-therapist">{{ apt.therapistName }}</p>
+            <p class="cs-appointment-reason">{{ apt.reason }}</p>
+          </div>
+          <button
+            class="cs-appointment-delete"
+            (click)="confirmDeleteAppointment(apt.id)"
+            aria-label="Cancelar cita"
+            title="Cancelar cita"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- CTA Button -->
+      <button class="cs-cta-button" (click)="openAppointmentModal()">
+        <span class="cs-cta-icon">🗓️</span>
+        Solicitar Cita
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Solicitud de Cita -->
+  <div class="cs-modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="cs-modal-content" (click)="$event.stopPropagation()">
+      <button class="cs-modal-close" (click)="closeModal()" aria-label="Cerrar">✕</button>
+
+      <div class="cs-modal-header">
+        <h2>🗓️ Solicitar Cita</h2>
+        <p>Completa los datos para agendar tu cita con un fisioterapeuta</p>
+      </div>
+
+      <div class="cs-modal-body">
+        <div class="cs-form-group">
+          <label for="therapist">Fisioterapeuta</label>
+          <select
+            id="therapist"
+            [(ngModel)]="appointmentForm.therapistId"
+            (change)="onTherapistChange()"
+          >
+            <option value="" disabled>Selecciona un fisioterapeuta</option>
+            <option *ngFor="let t of physiotherapists" [value]="t.id">
+              {{ t.emoji }} {{ t.name }} — {{ t.specialty }}
+            </option>
+          </select>
+        </div>
+
+        <div class="cs-form-group">
+          <label for="date">Fecha</label>
+          <input
+            type="date"
+            id="date"
+            [(ngModel)]="appointmentForm.date"
+            [min]="formatDate(today)"
+          />
+        </div>
+
+        <div class="cs-form-group">
+          <label for="time">Hora disponible</label>
+          <select
+            id="time"
+            [(ngModel)]="appointmentForm.time"
+            [disabled]="!appointmentForm.therapistId"
+          >
+            <option value="" disabled>Selecciona una hora</option>
+            <option *ngFor="let h of availableTimes" [value]="h">{{ h }}</option>
+          </select>
+          <p class="cs-form-hint" *ngIf="!appointmentForm.therapistId">
+            Primero selecciona un fisioterapeuta
+          </p>
+        </div>
+
+        <div class="cs-form-group">
+          <label for="reason">Motivo de consulta</label>
+          <textarea
+            id="reason"
+            [(ngModel)]="appointmentForm.reason"
+            placeholder="Describe el motivo de tu consulta (ej: seguimiento de rutina, dolor postural, evaluación inicial...)"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="cs-modal-footer">
+        <button class="cs-btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button
+          class="cs-btn-primary"
+          (click)="submitAppointment()"
+          [disabled]="!appointmentForm.therapistId || !appointmentForm.date || !appointmentForm.time"
+        >
+          Confirmar Cita
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmación de cancelación -->
+  <div class="cs-confirm-overlay" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()">
+    <div class="cs-confirm-dialog" (click)="$event.stopPropagation()">
+      <h3>¿Cancelar cita?</h3>
+      <p>¿Estás seguro de que deseas cancelar esta cita? Esta acción no se puede deshacer.</p>
+      <div class="cs-confirm-actions">
+        <button class="cs-btn-secondary" (click)="closeDeleteConfirm()">Volver</button>
+        <button class="cs-btn-danger" (click)="deleteAppointment()">Cancelar Cita</button>
+      </div>
+    </div>
+  </div>
+</div>
