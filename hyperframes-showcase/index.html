@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: #000;
+      font-family: "DM Sans", sans-serif;
+    }
+    .scene {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    #scene1 { z-index: 1; background: #0D0D14; }
+    #scene2 { z-index: 2; background: #0D0D14; opacity: 0; }
+    #scene3 { z-index: 3; background: #0D0D14; opacity: 0; }
+    #scene3b { z-index: 4; background: #0D0D14; opacity: 0; }
+    #scene4 { z-index: 5; background: #0D0D14; opacity: 0; }
+    #scene5 { z-index: 6; background: #0D0D14; opacity: 0; }
+    #scene6 { z-index: 7; background: #0D0D14; opacity: 0; }
+
+    /* === SHARED UTILITY CLASSES === */
+    .scene-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 100px 140px;
+      gap: 28px;
+      box-sizing: border-box;
+    }
+    .mono-label {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      font-size: 20px;
+      letter-spacing: 0.15em;
+      color: #9999BB;
+      text-transform: uppercase;
+    }
+    .accent-rule {
+      width: 80px;
+      height: 3px;
+      background: #9B59FF;
+      border-radius: 2px;
+      transform-origin: left;
+    }
+    .glass-card {
+      background: rgba(19, 19, 31, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(123, 47, 214, 0.2);
+      border-radius: 16px;
+      padding: 36px;
+    }
+
+    /* === SCENE 1: INTRO (0-4s) === */
+    .s1-radial-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(155,89,255,0.12) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+    .s1-ambient-orbs {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .s1-orb {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(155,89,255,0.06);
+      will-change: transform, opacity;
+    }
+    .s1-orb-1 { width: 300px; height: 300px; top: 15%; left: 10%; }
+    .s1-orb-2 { width: 200px; height: 200px; bottom: 20%; right: 15%; }
+    .s1-orb-3 { width: 120px; height: 120px; top: 60%; right: 25%; }
+    .s1-ghost-text {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 200px;
+      color: rgba(155,89,255,0.03);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+    .s1-logo-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: baseline;
+    }
+    .s1-logo-char {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 180px;
+      color: #F1F1FF;
+      letter-spacing: -0.03em;
+      will-change: transform, opacity;
+    }
+    .s1-logo-u {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 180px;
+      color: #9B59FF;
+      letter-spacing: -0.03em;
+      will-change: transform, opacity;
+    }
+    .s1-logo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #9B59FF;
+      margin-left: 2px;
+      align-self: flex-end;
+      margin-bottom: 22px;
+      will-change: transform, opacity;
+    }
+    .s1-tagline {
+      position: absolute;
+      top: calc(50% + 120px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: "DM Sans", sans-serif;
+      font-weight: 350;
+      font-size: 30px;
+      color: #F1F1FF;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      will-change: transform, opacity;
+    }
+    .s1-accent-line {
+      position: absolute;
+      top: calc(50% + 170px);
+      left: 50%;
+      width: 120px;
+      height: 2px;
+      background: rgba(155,89,255,0.5);
+      transform: translateX(-50%) scaleX(0);
+      transform-origin: center;
+      will-change: transform;
+    }
+    .s1-corner-bracket {
+      position: absolute;
+      border-color: rgba(90,31,168,0.4);
+      border-style: solid;
+      will-change: transform, opacity;
+    }
+    .s1-br-tl { top: 100px; left: 140px; width: 50px; height: 50px; border-width: 2px 0 0 2px; border-radius: 3px 0 0 0; }
+    .s1-br-tr { top: 100px; right: 140px; width: 50px; height: 50px; border-width: 2px 2px 0 0; border-radius: 0 3px 0 0; }
+    .s1-br-bl { bottom: 100px; left: 140px; width: 50px; height: 50px; border-width: 0 0 2px 2px; border-radius: 0 0 0 3px; }
+    .s1-br-br { bottom: 100px; right: 140px; width: 50px; height: 50px; border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; }
+
+    /* === SCENE 2: HERO (4-8.5s) === */
+    .s2-radial-glow {
+      position: absolute;
+      top: 30%;
+      right: 20%;
+      width: 900px;
+      height: 900px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,47,214,0.10) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .s2-grid-pattern {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(155,89,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(155,89,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      will-change: opacity;
+    }
+    .s2-content-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 0 140px;
+      gap: 100px;
+      box-sizing: border-box;
+    }
+    .s2-text-col {
+      flex: 0 0 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .s2-headline {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 130px;
+      color: #F1F1FF;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+    .s2-headline-accent {
+      color: #9B59FF;
+    }
+    .s2-description {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 350;
+      font-size: 26px;
+      color: #9999BB;
+      line-height: 1.6;
+      max-width: 460px;
+    }
+    .s2-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 44px;
+      font-family: "DM Sans", sans-serif;
+      font-weight: 500;
+      font-size: 20px;
+      color: #fff;
+      background: linear-gradient(135deg, #7B2FD6 0%, #9B59FF 100%);
+      border-radius: 12px;
+      text-decoration: none;
+      max-width: 220px;
+      will-change: transform, opacity;
+    }
+    .s2-device-col {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+    .s2-device-frame {
+      width: 440px;
+      height: 540px;
+      border-radius: 32px;
+      border: 2px solid rgba(123,47,214,0.3);
+      background: rgba(13,13,20,0.9);
+      position: relative;
+      overflow: hidden;
+      will-change: transform, opacity;
+    }
+    .s2-device-screen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(123,47,214,0.08) 0%, rgba(13,13,20,0.6) 60%);
+    }
+    .s2-posture-lines {
+      position: absolute;
+      inset: 0;
+    }
+    .s2-pl-line {
+      position: absolute;
+      height: 3px;
+      background: linear-gradient(90deg, #7B2FD6, rgba(123,47,214,0));
+      border-radius: 2px;
+      will-change: transform, opacity;
+    }
+    .s2-pl-line1 { width: 55%; top: 38%; left: 10%; }
+    .s2-pl-line2 { width: 40%; top: 58%; right: 12%; }
+    .s2-pl-line3 { width: 48%; top: 78%; left: 18%; }
+    .s2-pl-point {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #9B59FF;
+      box-shadow: 0 0 14px rgba(155,89,255,0.6);
+      will-change: transform, opacity;
+    }
+    .s2-pl-p1 { top: 35%; left: 14%; }
+    .s2-pl-p2 { top: 55%; right: 14%; }
+    .s2-pl-p3 { top: 75%; left: 20%; }
+    .s2-pl-p4 { top: 55%; left: 35%; }
+    .s2-feedback-bubble {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      padding: 12px 22px;
+      background: rgba(19,19,31,0.9);
+      border: 1px solid rgba(123,47,214,0.3);
+      border-radius: 24px;
+      font-family: "DM Sans", sans-serif;
+      font-weight: 400;
+      font-size: 17px;
+      color: #9B59FF;
+      will-change: transform, opacity;
+      white-space: nowrap;
+    }
+    .s2-vertical-rule {
+      position: absolute;
+      right: calc(50% - 1px);
+      top: 120px;
+      bottom: 120px;
+      width: 1px;
+      background: rgba(90,31,168,0.3);
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+
+    /* === SCENE 3: FEATURES (8.5-13s) === */
+    .s3-radial-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1000px;
+      height: 1000px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,47,214,0.08) 0%, transparent 60%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .s3-grid-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(155,89,255,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      will-change: opacity;
+    }
+    .s3-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 80px 140px 100px;
+      gap: 14px;
+      box-sizing: border-box;
+    }
+    .s3-heading {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 800;
+      font-size: 64px;
+      color: #F1F1FF;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .s3-heading-accent {
+      color: #9B59FF;
+    }
+    .s3-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 22px;
+      flex: 1;
+    }
+    .s3-card {
+      background: rgba(19,19,31,0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(123,47,214,0.18);
+      border-radius: 16px;
+      padding: 34px 38px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .s3-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(155,89,255,0.4), transparent);
+    }
+    .s3-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(123,47,214,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .s3-card-title {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 700;
+      font-size: 26px;
+      color: #F1F1FF;
+    }
+    .s3-card-desc {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 350;
+      font-size: 19px;
+      color: #9999BB;
+      line-height: 1.5;
+    }
+    .s3-center-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(155,89,255,0.06) 0%, transparent 60%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* === SCENE 3B: TESTIMONIALS (13-15.5s) === */
+    .s3b-radial-glow {
+      position: absolute;
+      top: 40%;
+      left: 60%;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,47,214,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .s3b-orbs {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .s3b-orbs .s3b-orb-item {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(155,89,255,0.05);
+    }
+    .s3b-orb-item:nth-child(1) { width: 200px; height: 200px; top: 10%; left: 5%; }
+    .s3b-orb-item:nth-child(2) { width: 140px; height: 140px; bottom: 15%; right: 10%; }
+    .s3b-orb-item:nth-child(3) { width: 100px; height: 100px; top: 50%; left: 30%; }
+    .s3b-cards-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      gap: 40px;
+      padding: 0 140px;
+      box-sizing: border-box;
+    }
+    .s3b-testimonial {
+      background: rgba(19,19,31,0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(123,47,214,0.15);
+      border-radius: 20px;
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+    .s3b-quote-mark {
+      font-family: "Georgia", serif;
+      font-size: 60px;
+      color: rgba(155,89,255,0.3);
+      line-height: 1;
+      margin-bottom: -20px;
+    }
+    .s3b-quote-text {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 400;
+      font-size: 22px;
+      color: #E0E0F0;
+      line-height: 1.6;
+      font-style: italic;
+    }
+    .s3b-author {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      font-size: 16px;
+      color: #9B59FF;
+      letter-spacing: 0.05em;
+    }
+    .s3b-section-label {
+      position: absolute;
+      top: 100px;
+      left: 140px;
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      font-size: 20px;
+      color: #9999BB;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* === SCENE 4: CAMERA/TECH (15.5-21s) === */
+    .s4-radial-glow {
+      position: absolute;
+      top: 45%;
+      left: 25%;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,47,214,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .s4-scan-lines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(155,89,255,0.02) 2px, rgba(155,89,255,0.02) 3px);
+      pointer-events: none;
+      will-change: opacity;
+    }
+    .s4-panels {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      padding: 60px 60px;
+      gap: 20px;
+      box-sizing: border-box;
+    }
+    .s4-panel {
+      background: rgba(19,19,31,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(123,47,214,0.18);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow: hidden;
+    }
+    .s4-panel-left { flex: 0 0 46%; }
+    .s4-panel-center { flex: 0 0 28%; }
+    .s4-panel-right { flex: 0 0 24%; }
+    .s4-panel-label {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      font-size: 18px;
+      color: #9999BB;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .s4-camera-view {
+      flex: 1;
+      background: rgba(13,13,20,0.8);
+      border-radius: 12px;
+      border: 1px solid rgba(123,47,214,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .s4-skeleton-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .s4-sk-joint {
+      will-change: opacity, r;
+    }
+    .s4-sk-line {
+      stroke: #9B59FF;
+      stroke-width: 2;
+      opacity: 0.5;
+      will-change: opacity;
+    }
+    .s4-sk-line-green {
+      stroke: #22C55E;
+      stroke-width: 2;
+      opacity: 0.5;
+      will-change: opacity;
+    }
+    .s4-recording-dot {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #EF4444;
+    }
+    .s4-recording-label {
+      position: absolute;
+      top: 14px;
+      right: 34px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      color: #EF4444;
+      letter-spacing: 0.08em;
+    }
+    .s4-metric-card {
+      background: rgba(26,26,46,0.6);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid rgba(123,47,214,0.1);
+    }
+    .s4-metric-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .s4-metric-label {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 400;
+      font-size: 18px;
+      color: #9999BB;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .s4-metric-value {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      font-size: 26px;
+      color: #F1F1FF;
+      font-variant-numeric: tabular-nums;
+    }
+    .s4-angle-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .s4-angle-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      color: #9999BB;
+      min-width: 70px;
+    }
+    .s4-angle-value {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 20px;
+      color: #F1F1FF;
+      font-variant-numeric: tabular-nums;
+      min-width: 50px;
+    }
+    .s4-angle-bar {
+      flex: 1;
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .s4-angle-fill {
+      height: 100%;
+      background: #22C55E;
+      border-radius: 4px;
+      width: 0%;
+      will-change: width;
+    }
+    .s4-correction-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(123,47,214,0.08);
+    }
+    .s4-correction-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .s4-correction-text {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 400;
+      font-size: 18px;
+      color: #C0C0D0;
+      line-height: 1.4;
+    }
+
+    /* === SCENE 5: STATS/DATA (21-26s) === */
+    .s5-radial-glow {
+      position: absolute;
+      bottom: 15%;
+      right: 15%;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,47,214,0.09) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .s5-data-matrix {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(155,89,255,0.04) 0.5px, transparent 0.5px);
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
+    .s5-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 80px 140px;
+      gap: 36px;
+      box-sizing: border-box;
+    }
+    .s5-stats-bar {
+      display: flex;
+      align-items: center;
+      gap: 44px;
+    }
+    .s5-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .s5-stat-value {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 72px;
+      color: #F1F1FF;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .s5-stat-value-green { color: #22C55E; }
+    .s5-stat-value-red { color: #EF4444; }
+    .s5-stat-label {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      font-size: 20px;
+      color: #9999BB;
+      letter-spacing: 0.08em;
+    }
+    .s5-stat-divider {
+      width: 1px;
+      height: 60px;
+      background: rgba(123,47,214,0.2);
+    }
+    .s5-compare-row {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+    .s5-selector-card {
+      background: rgba(19,19,31,0.8);
+      border: 1px solid rgba(123,47,214,0.18);
+      border-radius: 16px;
+      padding: 28px 30px;
+      flex: 1;
+    }
+    .s5-slot-badge {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 32px;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .s5-slot-a { background: #7B2FD6; }
+    .s5-slot-b { background: #22C55E; }
+    .s5-slot-title {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      color: #F1F1FF;
+    }
+    .s5-similarity-ring-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .s5-similarity-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 4px solid rgba(123,47,214,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .s5-similarity-fill {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-top-color: #9B59FF;
+      border-right-color: #9B59FF;
+      transform: rotate(-45deg);
+    }
+    .s5-similarity-value {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 28px;
+      color: #9B59FF;
+    }
+    .s5-similarity-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      color: #9999BB;
+      letter-spacing: 0.08em;
+    }
+    .s5-chart-area {
+      background: rgba(19,19,31,0.6);
+      border: 1px solid rgba(123,47,214,0.1);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      height: 160px;
+    }
+    .s5-chart-line-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .s5-chart-path {
+      stroke: #9B59FF;
+      stroke-width: 3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .s5-legend {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .s5-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+      color: #9999BB;
+    }
+    .s5-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* === SCENE 6: OUTRO (26-30s) === */
+    .s6-radial-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 900px;
+      height: 900px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(155,89,255,0.14) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .s6-logo-container {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: baseline;
+      will-change: transform, opacity;
+    }
+    .s6-logo-char {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 170px;
+      color: #F1F1FF;
+      letter-spacing: -0.03em;
+      will-change: transform, opacity;
+    }
+    .s6-logo-u {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 900;
+      font-size: 170px;
+      color: #9B59FF;
+      letter-spacing: -0.03em;
+      will-change: transform, opacity;
+    }
+    .s6-logo-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #9B59FF;
+      margin-left: 2px;
+      align-self: flex-end;
+      margin-bottom: 20px;
+      will-change: transform, opacity;
+    }
+    .s6-tagline {
+      position: absolute;
+      top: calc(46% + 110px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: "DM Sans", sans-serif;
+      font-weight: 350;
+      font-size: 28px;
+      color: #C0C0D0;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      will-change: transform, opacity;
+    }
+    .s6-accent-line {
+      position: absolute;
+      top: calc(46% + 155px);
+      left: 50%;
+      width: 140px;
+      height: 2px;
+      background: rgba(155,89,255,0.5);
+      transform: translateX(-50%) scaleX(0);
+      transform-origin: center;
+      will-change: transform;
+    }
+    .s6-fade-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      will-change: opacity;
+    }
+
+    /* Transition overlay for blur effects */
+    .transition-blur-overlay {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(0px);
+      z-index: 50;
+      pointer-events: none;
+      will-change: backdrop-filter;
+    }
+  </style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-width="1920"
+    data-height="1080"
+    data-start="0"
+    data-duration="30"
+  >
+    <!-- ============================================= -->
+    <!-- SCENE 1: INTRO (0s - 4s)                      -->
+    <!-- ============================================= -->
+    <div id="scene1" class="scene">
+      <div class="s1-radial-glow" id="s1-glow"></div>
+      <div class="s1-ambient-orbs">
+        <div class="s1-orb s1-orb-1" id="s1-orb1"></div>
+        <div class="s1-orb s1-orb-2" id="s1-orb2"></div>
+        <div class="s1-orb s1-orb-3" id="s1-orb3"></div>
+      </div>
+      <div class="s1-ghost-text" id="s1-ghost">AI.VISION.YOU.</div>
+      <div class="s1-logo-container" id="s1-logo-wrap">
+        <span class="s1-logo-char" id="s1-lc-a">a</span>
+        <span class="s1-logo-char" id="s1-lc-i">i</span>
+        <span class="s1-logo-char" id="s1-lc-v">v</span>
+        <span class="s1-logo-u" id="s1-lc-u">U</span>
+        <span class="s1-logo-dot" id="s1-dot"></span>
+      </div>
+      <div class="s1-tagline" id="s1-tagline">AI, Vision, yoU.</div>
+      <div class="s1-accent-line" id="s1-accent"></div>
+      <div class="s1-corner-bracket s1-br-tl" id="s1-brtl"></div>
+      <div class="s1-corner-bracket s1-br-tr" id="s1-brtr"></div>
+      <div class="s1-corner-bracket s1-br-bl" id="s1-brbl"></div>
+      <div class="s1-corner-bracket s1-br-br" id="s1-brbr"></div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SCENE 2: HERO (4s - 8.5s)                     -->
+    <!-- ============================================= -->
+    <div id="scene2" class="scene">
+      <div class="s2-radial-glow" id="s2-glow"></div>
+      <div class="s2-grid-pattern" id="s2-grid"></div>
+      <div class="s2-content-row">
+        <div class="s2-text-col">
+          <div class="mono-label" id="s2-label">PLATAFORMA</div>
+          <div class="s2-headline" id="s2-headline">
+            aivU<span class="s2-headline-accent">.</span>
+          </div>
+          <div class="s2-description" id="s2-desc">
+            Corrige tu postura con an&aacute;lisis 3D, seguimiento en tiempo real y recomendaciones personalizadas impulsadas por IA.
+          </div>
+          <div class="s2-cta-btn" id="s2-cta">Comienza Ahora</div>
+        </div>
+        <div class="s2-device-col">
+          <div class="s2-device-frame" id="s2-device">
+            <div class="s2-device-screen"></div>
+            <div class="s2-posture-lines">
+              <div class="s2-pl-line s2-pl-line1" id="s2-pl1"></div>
+              <div class="s2-pl-line s2-pl-line2" id="s2-pl2"></div>
+              <div class="s2-pl-line s2-pl-line3" id="s2-pl3"></div>
+              <div class="s2-pl-point s2-pl-p1" id="s2-pp1"></div>
+              <div class="s2-pl-point s2-pl-p2" id="s2-pp2"></div>
+              <div class="s2-pl-point s2-pl-p3" id="s2-pp3"></div>
+              <div class="s2-pl-point s2-pl-p4" id="s2-pp4"></div>
+            </div>
+            <div class="s2-feedback-bubble" id="s2-bubble">&#xA1;Alinea tu postura!</div>
+          </div>
+        </div>
+      </div>
+      <div class="s2-vertical-rule" id="s2-vrule"></div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SCENE 3: FEATURES (8.5s - 13s)                -->
+    <!-- ============================================= -->
+    <div id="scene3" class="scene">
+      <div class="s3-radial-glow" id="s3-glow"></div>
+      <div class="s3-grid-dots" id="s3-dots"></div>
+      <div class="s3-content">
+        <div class="mono-label" id="s3-label">CARACTER&Iacute;STICAS</div>
+        <div class="s3-heading" id="s3-heading">
+          Tecnolog&iacute;a <span class="s3-heading-accent">inteligente</span> para tu postura
+        </div>
+        <div class="s3-cards-grid">
+          <div class="s3-card" id="s3-card1">
+            <div class="s3-card-icon">&#x1F3AF;</div>
+            <div class="s3-card-title">Alta Precisi&oacute;n</div>
+            <div class="s3-card-desc">Detecci&oacute;n precisa con IA entrenada en miles de posturas humanas.</div>
+          </div>
+          <div class="s3-card" id="s3-card2">
+            <div class="s3-card-icon">&#x2764;&#xFE0F;</div>
+            <div class="s3-card-title">Salud y Bienestar</div>
+            <div class="s3-card-desc">Previene dolores musculares y lesiones con correcci&oacute;n inteligente.</div>
+          </div>
+          <div class="s3-card" id="s3-card3">
+            <div class="s3-card-icon">&#x26A1;</div>
+            <div class="s3-card-title">Tiempo Real</div>
+            <div class="s3-card-desc">Visualiza tus movimientos con gu&iacute;as instant&aacute;neas mientras entrenas.</div>
+          </div>
+          <div class="s3-card" id="s3-card4">
+            <div class="s3-card-icon">&#x1F4C8;</div>
+            <div class="s3-card-title">Historial y Progreso</div>
+            <div class="s3-card-desc">Monitorea tu evoluci&oacute;n postural a lo largo del tiempo.</div>
+          </div>
+        </div>
+      </div>
+      <div class="s3-center-glow" id="s3-center"></div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SCENE 3B: TESTIMONIALS (13s - 15.5s)          -->
+    <!-- ============================================= -->
+    <div id="scene3b" class="scene">
+      <div class="s3b-radial-glow" id="s3b-glow"></div>
+      <div class="s3b-orbs">
+        <div class="s3b-orb-item" id="s3b-orb1"></div>
+        <div class="s3b-orb-item" id="s3b-orb2"></div>
+        <div class="s3b-orb-item" id="s3b-orb3"></div>
+      </div>
+      <div class="s3b-section-label" id="s3b-label">TESTIMONIOS</div>
+      <div class="s3b-cards-row">
+        <div class="s3b-testimonial" id="s3b-t1">
+          <div class="s3b-quote-mark">&ldquo;</div>
+          <div class="s3b-quote-text">Desde que uso aivU mi postura al entrenar ha mejorado notablemente. Es como tener un entrenador personal.</div>
+          <div class="s3b-author">&mdash; Laura G.</div>
+        </div>
+        <div class="s3b-testimonial" id="s3b-t2">
+          <div class="s3b-quote-mark">&ldquo;</div>
+          <div class="s3b-quote-text">Trabajo muchas horas sentado y aivU me ha ayudado a mantener una postura saludable todo el d&iacute;a.</div>
+          <div class="s3b-author">&mdash; Andr&eacute;s M.</div>
+        </div>
+        <div class="s3b-testimonial" id="s3b-t3">
+          <div class="s3b-quote-mark">&ldquo;</div>
+          <div class="s3b-quote-text">La retroalimentaci&oacute;n en tiempo real es impresionante. Mi cuerpo se adapta mejor en cada sesi&oacute;n.</div>
+          <div class="s3b-author">&mdash; Sof&iacute;a R.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SCENE 4: CAMERA/TECH (15.5s - 21s)            -->
+    <!-- ============================================= -->
+    <div id="scene4" class="scene">
+      <div class="s4-radial-glow" id="s4-glow"></div>
+      <div class="s4-scan-lines" id="s4-scan"></div>
+      <div class="s4-panels">
+        <!-- Left: Camera -->
+        <div class="s4-panel s4-panel-left" id="s4-panel-l">
+          <div class="s4-panel-label">C&aacute;mara</div>
+          <div class="s4-camera-view" id="s4-camera">
+            <svg class="s4-skeleton-svg" viewBox="0 0 480 400">
+              <circle id="s4-j-head" cx="240" cy="60" r="14" fill="#7B2FD6" opacity="0.8" class="s4-sk-joint"/>
+              <circle id="s4-j-lsh" cx="200" cy="130" r="9" fill="#9B59FF" class="s4-sk-joint"/>
+              <circle id="s4-j-rsh" cx="280" cy="130" r="9" fill="#9B59FF" class="s4-sk-joint"/>
+              <circle id="s4-j-lel" cx="170" cy="220" r="9" fill="#22C55E" class="s4-sk-joint"/>
+              <circle id="s4-j-rel" cx="310" cy="220" r="9" fill="#22C55E" class="s4-sk-joint"/>
+              <circle id="s4-j-lwr" cx="150" cy="320" r="7" fill="#22C55E" opacity="0.7" class="s4-sk-joint"/>
+              <circle id="s4-j-rwr" cx="330" cy="320" r="7" fill="#22C55E" opacity="0.7" class="s4-sk-joint"/>
+              <line id="s4-l-sh" x1="200" y1="130" x2="280" y2="130" class="s4-sk-line"/>
+              <line id="s4-l-lse" x1="200" y1="130" x2="170" y2="220" class="s4-sk-line"/>
+              <line id="s4-l-lew" x1="170" y1="220" x2="150" y2="320" class="s4-sk-line-green"/>
+              <line id="s4-l-rse" x1="280" y1="130" x2="310" y2="220" class="s4-sk-line"/>
+              <line id="s4-l-rew" x1="310" y1="220" x2="330" y2="320" class="s4-sk-line-green"/>
+            </svg>
+            <div class="s4-recording-dot" id="s4-rec-dot"></div>
+            <div class="s4-recording-label" id="s4-rec-label">Analizando</div>
+          </div>
+        </div>
+        <!-- Center: Metrics -->
+        <div class="s4-panel s4-panel-center" id="s4-panel-c">
+          <div class="s4-panel-label">M&eacute;tricas</div>
+          <div class="s4-metric-card" id="s4-m1">
+            <div class="s4-metric-icon" style="background:rgba(155,89,255,0.15);">&#x1F3AF;</div>
+            <div>
+              <div class="s4-metric-label">Precisi&oacute;n</div>
+              <div class="s4-metric-value" id="s4-val-prec">97.3%</div>
+            </div>
+          </div>
+          <div class="s4-metric-card" id="s4-m2">
+            <div class="s4-metric-icon" style="background:rgba(34,197,94,0.15);">&#x1F504;</div>
+            <div>
+              <div class="s4-metric-label">Reps</div>
+              <div class="s4-metric-value">8 / 12</div>
+            </div>
+          </div>
+          <div class="s4-metric-card" id="s4-m3">
+            <div class="s4-metric-icon" style="background:rgba(234,179,8,0.15);">&#x23F1;</div>
+            <div>
+              <div class="s4-metric-label">Tiempo</div>
+              <div class="s4-metric-value" style="font-size:22px;">01:42</div>
+            </div>
+          </div>
+          <div class="s4-metric-card" id="s4-m4">
+            <div class="s4-metric-icon" style="background:rgba(155,89,255,0.12);">&#x1F4A8;</div>
+            <div>
+              <div class="s4-metric-label">Cadencia</div>
+              <div class="s4-metric-value" style="font-size:22px;">14.2/min</div>
+            </div>
+          </div>
+          <div class="s4-angle-item" id="s4-ang1">
+            <span class="s4-angle-label">Codo Izq</span>
+            <span class="s4-angle-value">125&deg;</span>
+            <div class="s4-angle-bar"><div class="s4-angle-fill" id="s4-fill1"></div></div>
+          </div>
+          <div class="s4-angle-item" id="s4-ang2">
+            <span class="s4-angle-label">Codo Der</span>
+            <span class="s4-angle-value">120&deg;</span>
+            <div class="s4-angle-bar"><div class="s4-angle-fill" id="s4-fill2"></div></div>
+          </div>
+        </div>
+        <!-- Right: Corrections -->
+        <div class="s4-panel s4-panel-right" id="s4-panel-r">
+          <div class="s4-panel-label">Correcciones</div>
+          <div class="s4-correction-item" id="s4-corr1">
+            <div class="s4-correction-dot" style="background:#22C55E;"></div>
+            <span class="s4-correction-text">&Aacute;ngulo brazos correcto</span>
+          </div>
+          <div class="s4-correction-item" id="s4-corr2">
+            <div class="s4-correction-dot" style="background:#22C55E;"></div>
+            <span class="s4-correction-text">Cadencia &oacute;ptima</span>
+          </div>
+          <div class="s4-correction-item" id="s4-corr3">
+            <div class="s4-correction-dot" style="background:#EAB308;"></div>
+            <span class="s4-correction-text">Ajustar altura hombros</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SCENE 5: STATS/DATA (21s - 26s)               -->
+    <!-- ============================================= -->
+    <div id="scene5" class="scene">
+      <div class="s5-radial-glow" id="s5-glow"></div>
+      <div class="s5-data-matrix" id="s5-matrix"></div>
+      <div class="s5-content">
+        <div class="mono-label" id="s5-label">DATOS DE ENTRENAMIENTO</div>
+        <div class="s5-stats-bar">
+          <div class="s5-stat" id="s5-stat1">
+            <span class="s5-stat-value" id="s5-val-total">247</span>
+            <span class="s5-stat-label">Total guardados</span>
+          </div>
+          <div class="s5-stat-divider" id="s5-div1"></div>
+          <div class="s5-stat" id="s5-stat2">
+            <span class="s5-stat-value s5-stat-value-green" id="s5-val-correct">189</span>
+            <span class="s5-stat-label">Correctos</span>
+          </div>
+          <div class="s5-stat-divider" id="s5-div2"></div>
+          <div class="s5-stat" id="s5-stat3">
+            <span class="s5-stat-value s5-stat-value-red" id="s5-val-incorrect">58</span>
+            <span class="s5-stat-label">Incorrectos</span>
+          </div>
+        </div>
+        <div class="s5-compare-row">
+          <div class="s5-selector-card" id="s5-sel-a">
+            <div class="s5-slot-badge s5-slot-a">A</div>
+            <div class="s5-slot-title">Ejercicio A</div>
+          </div>
+          <div class="s5-similarity-ring-wrap" id="s5-sim-wrap">
+            <div class="s5-similarity-ring">
+              <div class="s5-similarity-fill" id="s5-sim-fill"></div>
+              <span class="s5-similarity-value" id="s5-sim-val">84%</span>
+            </div>
+            <span class="s5-similarity-label">Similitud</span>
+          </div>
+          <div class="s5-selector-card" id="s5-sel-b">
+            <div class="s5-slot-badge s5-slot-b">B</div>
+            <div class="s5-slot-title">Ejercicio B</div>
+          </div>
+        </div>
+        <div class="s5-chart-area" id="s5-chart">
+          <svg class="s5-chart-line-svg" viewBox="0 0 1100 160" preserveAspectRatio="none">
+            <path class="s5-chart-path" id="s5-chart-path"
+              d="M0,120 C50,120 100,80 150,60 S250,30 300,50 S400,100 450,70 S550,20 600,40 S700,90 750,55 S850,25 900,45 S1000,100 1050,65 S1100,40 1100,40"
+              stroke-dasharray="2000" stroke-dashoffset="2000"/>
+          </svg>
+        </div>
+        <div class="s5-legend" id="s5-legend">
+          <div class="s5-legend-item"><span class="s5-legend-dot" style="background:#9B59FF;"></span> Ejercicio A</div>
+          <div class="s5-legend-item"><span class="s5-legend-dot" style="background:#22C55E;"></span> Ejercicio B</div>
+          <div class="s5-legend-item"><span class="s5-legend-dot" style="background:#22C55E;"></span> Correcto</div>
+          <div class="s5-legend-item"><span class="s5-legend-dot" style="background:#EF4444;"></span> Incorrecto</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SCENE 6: OUTRO (26s - 30s)                    -->
+    <!-- ============================================= -->
+    <div id="scene6" class="scene">
+      <div class="s6-radial-glow" id="s6-glow"></div>
+      <div class="s6-logo-container" id="s6-logo-wrap">
+        <span class="s6-logo-char" id="s6-lc-a">a</span>
+        <span class="s6-logo-char" id="s6-lc-i">i</span>
+        <span class="s6-logo-char" id="s6-lc-v">v</span>
+        <span class="s6-logo-u" id="s6-lc-u">U</span>
+        <span class="s6-logo-dot" id="s6-dot"></span>
+      </div>
+      <div class="s6-tagline" id="s6-tagline">Tu asistente inteligente para una mejor postura</div>
+      <div class="s6-accent-line" id="s6-accent"></div>
+      <div class="s6-fade-overlay" id="s6-fade"></div>
+    </div>
+
+  </div><!-- /root -->
+
+  <!-- ============================================= -->
+  <!-- GSAP TIMELINE                                -->
+  <!-- ============================================= -->
+  <script>
+    window.__timelines = window.__timelines || {};
+    var tl = gsap.timeline({ paused: true });
+
+    // Beat markers (sync points for music, ~128 BPM)
+    // 0.0s  - Fade from black
+    // 2.0s  - Logo assembles
+    // 4.0s  - [DOWNBEAT] Transition S1→S2
+    // 6.5s  - CTA button pulse
+    // 8.5s  - [DOWNBEAT] Transition S2→S3
+    // 9.6s  - Feature cards cascade
+    // 13.0s - [BEAT] Transition S3→S3b
+    // 13.8s - Testimonials float in
+    // 15.5s - [STRONG DOWNBEAT] Transition S3b→S4
+    // 17.0s - Angle bars fill
+    // 17.5s - Recording dot pulses
+    // 21.0s - [BEAT] Transition S4→S5
+    // 22.0s - Counters spin up
+    // 23.5s - Chart draws
+    // 26.0s - [DOWNBEAT] Transition S5→S6
+    // 27.5s - Tagline reveals
+    // 29.0s - Fade to black begins
+    // 30.0s - END
+
+    // =============================================
+    // SCENE 1: INTRO — Entrances only
+    // =============================================
+    tl.set("#s1-glow", { opacity: 0, scale: 0.7 }, 0);
+    tl.to("#s1-glow", { opacity: 1, scale: 1, duration: 1.6, ease: "power2.out" }, 0.1);
+
+    tl.set("#s1-orb1", { opacity: 0, y: 30 }, 0);
+    tl.to("#s1-orb1", { opacity: 0.6, y: 0, duration: 2.0, ease: "sine.inOut" }, 0.3);
+    tl.set("#s1-orb2", { opacity: 0, y: -20 }, 0);
+    tl.to("#s1-orb2", { opacity: 0.5, y: 0, duration: 1.8, ease: "sine.out" }, 0.5);
+    tl.set("#s1-orb3", { opacity: 0, x: 20 }, 0);
+    tl.to("#s1-orb3", { opacity: 0.4, x: 0, duration: 2.2, ease: "power1.out" }, 0.4);
+
+    tl.set("#s1-ghost", { opacity: 0, y: 15 }, 0);
+    tl.to("#s1-ghost", { opacity: 1, y: -8, duration: 2.0, ease: "power2.out" }, 0.6);
+    tl.to("#s1-ghost", { opacity: 0.55, duration: 1.4, ease: "power2.out", overwrite: "auto" }, 2.2);
+
+    // Logo letters converge
+    tl.fromTo("#s1-lc-a", { opacity: 0, x: -40, y: 18 }, { opacity: 1, x: 0, y: 0, duration: 0.55, ease: "power3.out" }, 0.7);
+    tl.fromTo("#s1-lc-i", { opacity: 0, x: -20, y: -12 }, { opacity: 1, x: 0, y: 0, duration: 0.5, ease: "expo.out" }, 0.85);
+    tl.fromTo("#s1-lc-v", { opacity: 0, x: 20, y: 14 }, { opacity: 1, x: 0, y: 0, duration: 0.55, ease: "power4.out" }, 0.9);
+    tl.fromTo("#s1-lc-u", { opacity: 0, x: 40, y: -10 }, { opacity: 1, x: 0, y: 0, duration: 0.6, ease: "back.out(1.4)" }, 1.0);
+    tl.fromTo("#s1-dot", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.45, ease: "elastic.out(1, 0.4)" }, 1.45);
+
+    // Brackets draw
+    tl.fromTo("#s1-brtl", { opacity: 0, scaleX: 0, scaleY: 0 }, { opacity: 0.45, scaleX: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 0.45);
+    tl.fromTo("#s1-brtr", { opacity: 0, scaleX: 0, scaleY: 0 }, { opacity: 0.45, scaleX: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 0.5);
+    tl.fromTo("#s1-brbl", { opacity: 0, scaleX: 0, scaleY: 0 }, { opacity: 0.45, scaleX: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 0.55);
+    tl.fromTo("#s1-brbr", { opacity: 0, scaleX: 0, scaleY: 0 }, { opacity: 0.45, scaleX: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 0.6);
+
+    // Tagline types on
+    tl.fromTo("#s1-tagline", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.9);
+    tl.fromTo("#s1-accent", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "power3.out" }, 2.1);
+
+    // Dot breathes
+    tl.to("#s1-dot", { scale: 1.25, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.0);
+    // Glow breathing
+    tl.to("#s1-glow", { scale: 1.04, duration: 2.0, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.2);
+
+    // =============================================
+    // TRANSITION S1 → S2 (4.0s): Blur crossfade
+    // =============================================
+    tl.to("#scene1", { opacity: 0, filter: "blur(20px)", duration: 0.3, ease: "power2.in" }, 4.0);
+    tl.set("#scene1", { opacity: 0, visibility: "hidden" }, 4.35);
+    tl.fromTo("#scene2", { opacity: 0, filter: "blur(20px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" }, 4.15);
+
+    // =============================================
+    // SCENE 2: HERO — Entrances only
+    // =============================================
+    tl.fromTo("#s2-glow", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, 4.2);
+    tl.fromTo("#s2-grid", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 4.3);
+    tl.fromTo("#s2-label", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 4.35);
+    tl.fromTo("#s2-headline", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 4.5);
+    tl.fromTo("#s2-desc", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 4.8);
+    tl.fromTo("#s2-vrule", { scaleY: 0 }, { scaleY: 1, duration: 0.45, ease: "power3.out" }, 4.6);
+    tl.fromTo("#s2-device", { opacity: 0, x: 60, rotationY: 8, transformPerspective: 1200 }, { opacity: 1, x: 0, rotationY: -4, transformPerspective: 1200, duration: 0.8, ease: "power3.out" }, 4.4);
+    // Ken Burns on device
+    tl.to("#s2-device", { rotationY: -3, duration: 4.0, ease: "none" }, 4.4);
+
+    // Posture overlay elements staggered
+    tl.fromTo("#s2-pl1, #s2-pl2, #s2-pl3", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.4, ease: "power3.out", stagger: 0.12 }, 5.2);
+    tl.fromTo("#s2-pp1, #s2-pp2, #s2-pp3, #s2-pp4", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.5)", stagger: 0.08 }, 5.5);
+    // Point pulse
+    tl.to("#s2-pp1, #s2-pp2, #s2-pp3, #s2-pp4", { scale: 1.3, opacity: 0.7, duration: 0.5, ease: "sine.inOut", yoyo: true, stagger: 0.1 }, 5.9);
+
+    tl.fromTo("#s2-bubble", { opacity: 0, y: 20, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.3)" }, 6.0);
+    tl.fromTo("#s2-cta", { opacity: 0, y: 15, boxShadow: "0 0 0 0 rgba(123,47,214,0.5)" }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, 6.5);
+    // CTA pulse glow ring
+    tl.to("#s2-cta", { boxShadow: "0 0 0 12px rgba(123,47,214,0)", duration: 1.5, ease: "power2.out", overwrite: "auto" }, 6.6);
+
+    // =============================================
+    // TRANSITION S2 → S3 (8.5s): Push slide right
+    // =============================================
+    tl.to("#scene2", { x: -120, opacity: 0, filter: "blur(12px)", duration: 0.3, ease: "power2.in" }, 8.5);
+    tl.set("#scene2", { opacity: 0, visibility: "hidden", x: 0, filter: "blur(0px)" }, 8.85);
+    tl.fromTo("#scene3", { x: 120, opacity: 0, filter: "blur(12px)" }, { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" }, 8.65);
+
+    // =============================================
+    // SCENE 3: FEATURES — Entrances only
+    // =============================================
+    tl.fromTo("#s3-glow", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" }, 8.6);
+    tl.fromTo("#s3-dots", { opacity: 0 }, { opacity: 0.6, duration: 0.8, ease: "power2.out" }, 8.7);
+    tl.fromTo("#s3-label", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 8.8);
+    tl.fromTo("#s3-heading", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, 9.0);
+
+    // Cards cascade with varied eases and directions
+    tl.fromTo("#s3-card1", { opacity: 0, y: 50, x: -15 }, { opacity: 1, y: 0, x: 0, duration: 0.5, ease: "power3.out" }, 9.4);
+    tl.fromTo("#s3-card2", { opacity: 0, y: 60, x: 10 }, { opacity: 1, y: 0, x: 0, duration: 0.5, ease: "expo.out" }, 9.52);
+    tl.fromTo("#s3-card3", { opacity: 0, y: 40, x: -8 }, { opacity: 1, y: 0, x: 0, duration: 0.48, ease: "power4.out" }, 9.64);
+    tl.fromTo("#s3-card4", { opacity: 0, y: 55, x: 12 }, { opacity: 1, y: 0, x: 0, duration: 0.52, ease: "back.out(1.15)" }, 9.76);
+
+    tl.fromTo("#s3-center", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 9.1);
+    tl.to("#s3-center", { scale: 1.06, opacity: 0.7, duration: 2.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 10.2);
+
+    // =============================================
+    // TRANSITION S3 → S3B (13.0s): Blur crossfade
+    // =============================================
+    tl.to("#scene3", { opacity: 0, filter: "blur(15px)", duration: 0.25, ease: "power2.in", overwrite: "auto" }, 13.0);
+    tl.set("#scene3", { opacity: 0, visibility: "hidden", filter: "blur(0px)" }, 13.3);
+    tl.fromTo("#scene3b", { opacity: 0, filter: "blur(15px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out", overwrite: "auto" }, 13.15);
+
+    // =============================================
+    // SCENE 3B: TESTIMONIALS — Fast, elegant
+    // =============================================
+    tl.fromTo("#s3b-glow", { opacity: 0 }, { opacity: 0.8, duration: 0.7, ease: "power2.out" }, 13.1);
+    tl.fromTo("#s3b-orb1", { opacity: 0, y: 15 }, { opacity: 0.6, y: 0, duration: 1.2, ease: "sine.out" }, 13.2);
+    tl.fromTo("#s3b-orb2", { opacity: 0, y: -10 }, { opacity: 0.5, y: 0, duration: 1.0, ease: "sine.out" }, 13.3);
+    tl.fromTo("#s3b-orb3", { opacity: 0, x: 10 }, { opacity: 0.4, x: 0, duration: 1.1, ease: "power1.out" }, 13.4);
+    tl.fromTo("#s3b-label", { opacity: 0, x: -15 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 13.2);
+
+    // Testimonial cards float in — staggered with distinct eases
+    tl.fromTo("#s3b-t1", { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 13.5);
+    tl.fromTo("#s3b-t2", { opacity: 0, y: 40, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "expo.out" }, 13.65);
+    tl.fromTo("#s3b-t3", { opacity: 0, y: 25, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.48, ease: "back.out(1.2)" }, 13.8);
+
+    // =============================================
+    // TRANSITION S3B → S4 (15.5s): Zoom through
+    // =============================================
+    tl.to("#scene3b", { scale: 1.15, opacity: 0, filter: "blur(15px)", duration: 0.28, ease: "power3.in", overwrite: "auto" }, 15.5);
+    tl.set("#scene3b", { opacity: 0, visibility: "hidden", scale: 1, filter: "blur(0px)" }, 15.82);
+    tl.fromTo("#scene4", { scale: 0.82, opacity: 0, filter: "blur(15px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "expo.out", overwrite: "auto" }, 15.65);
+
+    // =============================================
+    // SCENE 4: CAMERA/TECH — PEAK energy
+    // =============================================
+    tl.fromTo("#s4-glow", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 15.6);
+    tl.fromTo("#s4-scan", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 15.7);
+
+    // Three panels enter staggered
+    tl.fromTo("#s4-panel-l", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 15.8);
+    tl.fromTo("#s4-panel-c", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.42, ease: "expo.out" }, 15.95);
+    tl.fromTo("#s4-panel-r", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.45, ease: "power4.out" }, 16.1);
+
+    // Skeleton joints appear
+    tl.fromTo("#s4-j-head, #s4-j-lsh, #s4-j-rsh, #s4-j-lel, #s4-j-rel, #s4-j-lwr, #s4-j-rwr",
+      { opacity: 0, r: 0 }, { opacity: "+=0.8", duration: 0.3, ease: "back.out(1.5)", stagger: 0.08 }, 16.2);
+    tl.fromTo("#s4-l-sh, #s4-l-lse, #s4-l-rse",
+      { opacity: 0 }, { opacity: 0.5, duration: 0.4, ease: "power2.out", stagger: 0.06 }, 16.4);
+    tl.fromTo("#s4-l-lew, #s4-l-rew",
+      { opacity: 0 }, { opacity: 0.5, duration: 0.35, ease: "power2.out", stagger: 0.06 }, 16.5);
+
+    // Recording indicator
+    tl.fromTo("#s4-rec-dot", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "elastic.out(1,0.4)" }, 17.0);
+    tl.to("#s4-rec-dot", { opacity: 0.5, scale: 1.2, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 3, overwrite: "auto" }, 17.4);
+    tl.fromTo("#s4-rec-label", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 17.1);
+
+    // Metrics cards
+    tl.fromTo("#s4-m1", { opacity: 0, x: -15 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 16.3);
+    tl.fromTo("#s4-m2", { opacity: 0, x: 15 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 16.45);
+    tl.fromTo("#s4-m3", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 16.6);
+    tl.fromTo("#s4-m4", { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 16.75);
+
+    // Angle bars fill
+    tl.fromTo("#s4-ang1", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 16.9);
+    tl.fromTo("#s4-ang2", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 17.0);
+    tl.to("#s4-fill1", { width: "65%", duration: 0.6, ease: "power3.out" }, 17.1);
+    tl.to("#s4-fill2", { width: "62%", duration: 0.6, ease: "power3.out" }, 17.2);
+
+    // Corrections
+    tl.fromTo("#s4-corr1", { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.25, ease: "power2.out" }, 17.0);
+    tl.fromTo("#s4-corr2", { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.25, ease: "power2.out" }, 17.15);
+    tl.fromTo("#s4-corr3", { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.25, ease: "power2.out" }, 17.3);
+
+    // =============================================
+    // TRANSITION S4 → S5 (21.0s): Blur through
+    // =============================================
+    tl.to("#scene4", { opacity: 0, filter: "blur(12px)", duration: 0.25, ease: "power2.in" }, 21.0);
+    tl.set("#scene4", { opacity: 0, visibility: "hidden", filter: "blur(0px)" }, 21.3);
+    tl.fromTo("#scene5", { opacity: 0, filter: "blur(12px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, 21.15);
+
+    // =============================================
+    // SCENE 5: STATS/DATA — Entrances only
+    // =============================================
+    tl.fromTo("#s5-glow", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 21.1);
+    tl.fromTo("#s5-matrix", { opacity: 0 }, { opacity: 0.5, duration: 0.6, ease: "power2.out" }, 21.2);
+    tl.fromTo("#s5-label", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 21.3);
+
+    // Stats bar — counter animation approximated with decrementing from high values
+    // (Counters animate from 0 to target via stagger)
+    tl.fromTo("#s5-stat1", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 21.5);
+    tl.fromTo("#s5-div1", { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 21.7);
+    tl.fromTo("#s5-stat2", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 21.6);
+    tl.fromTo("#s5-div2", { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power2.out" }, 21.8);
+    tl.fromTo("#s5-stat3", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 21.7);
+
+    // Comparison selectors
+    tl.fromTo("#s5-sel-a", { opacity: 0, x: -25 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 22.0);
+    tl.fromTo("#s5-sel-b", { opacity: 0, x: 25 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 22.2);
+    // Similarity ring
+    tl.fromTo("#s5-sim-wrap", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.2)" }, 22.4);
+    tl.fromTo("#s5-sim-fill", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 22.6);
+
+    // Chart draws
+    tl.fromTo("#s5-chart", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 23.0);
+    tl.to("#s5-chart-path", { strokeDashoffset: 0, duration: 1.6, ease: "power2.out" }, 23.2);
+
+    // Legend
+    tl.fromTo("#s5-legend", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 24.5);
+
+    // =============================================
+    // TRANSITION S5 → S6 (26.0s): Blur crossfade (gentle)
+    // =============================================
+    tl.to("#scene5", { opacity: 0, filter: "blur(25px)", duration: 0.35, ease: "sine.inOut", overwrite: "auto" }, 26.0);
+    tl.set("#scene5", { opacity: 0, visibility: "hidden", filter: "blur(0px)" }, 26.4);
+    tl.fromTo("#scene6", { opacity: 0, filter: "blur(25px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power2.out", overwrite: "auto" }, 26.2);
+
+    // =============================================
+    // SCENE 6: OUTRO — Entrances + EXIT animations
+    // =============================================
+    tl.fromTo("#s6-glow", { opacity: 0, scale: 0.75 }, { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" }, 26.1);
+
+    // Logo reveals centered
+    tl.fromTo("#s6-lc-a", { opacity: 0, x: -25 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 26.3);
+    tl.fromTo("#s6-lc-i", { opacity: 0, x: -15 }, { opacity: 1, x: 0, duration: 0.38, ease: "expo.out" }, 26.4);
+    tl.fromTo("#s6-lc-v", { opacity: 0, x: 15 }, { opacity: 1, x: 0, duration: 0.4, ease: "power4.out" }, 26.5);
+    tl.fromTo("#s6-lc-u", { opacity: 0, x: 25 }, { opacity: 1, x: 0, duration: 0.42, ease: "back.out(1.3)" }, 26.6);
+    tl.fromTo("#s6-dot", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.35, ease: "elastic.out(1,0.4)" }, 26.9);
+
+    // Tagline
+    tl.fromTo("#s6-tagline", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 27.2);
+    tl.fromTo("#s6-accent", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power3.out" }, 27.4);
+
+    // Dot pulse
+    tl.to("#s6-dot", { scale: 1.3, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 27.6);
+
+    // === EXIT ANIMATIONS (only on final scene) ===
+    // Fade to black over last 1.5s
+    tl.to("#s6-fade", { opacity: 1, duration: 0.8, ease: "power2.in" }, 28.8);
+    tl.to("#s6-logo-wrap", { opacity: 0, scale: 0.96, duration: 0.5, ease: "power2.in" }, 28.8);
+    tl.to("#s6-tagline", { opacity: 0, duration: 0.4, ease: "power2.in" }, 28.8);
+    tl.to("#s6-accent", { opacity: 0, duration: 0.3, ease: "power2.in" }, 28.8);
+    tl.to("#s6-glow", { opacity: 0, duration: 0.5, ease: "power2.in" }, 28.8);
+
+    // Hard-kill after fade
+    tl.set("#s6-logo-wrap, #s6-tagline, #s6-accent, #s6-glow", { opacity: 0, visibility: "hidden" }, 29.6);
+    tl.set("#scene6", { visibility: "hidden" }, 29.7);
+
+    // Register timeline
+    window.__timelines["main"] = tl;
+  </script>
+
+  <!--
+    =============================================
+    AUDIO SYNC MARKERS
+    =============================================
+    Pre-extracted audio data would drive these beat-reactive properties:
+    - Bass (bands[0]) → glow intensity, accent pulse scale
+    - Overall amplitude → transition blur amounts
+    - Treble (bands[12-14]) → accent shimmer
+
+    Integration pattern (requires AUDIO_DATA from extract-audio-data.py):
+    for (var f = 0; f < AUDIO_DATA.totalFrames; f++) {
+      tl.call(function(frame) {
+        return function() {
+          var bass = frame.bands[0];
+          var amp = frame.bands.reduce(function(a,b){return a+b;},0) / frame.bands.length;
+          gsap.set("#s1-glow", { opacity: 0.85 + bass * 0.35 });
+          gsap.set("#s1-dot", { scale: 1 + bass * 0.25 });
+        };
+      }(AUDIO_DATA.frames[f]), [], f / AUDIO_DATA.fps);
+    }
+
+    Beat timing map (128 BPM, 4/4):
+    0.00 — Bar 1, Beat 1 — Composition start
+    0.47 — Bar 2, Beat 1
+    0.94 — Bar 3, Beat 1
+    1.41 — Bar 4, Beat 1
+    1.88 — Bar 5, Beat 1 — Logo letters converge
+    2.34 — Bar 6, Beat 1 — Tagline
+    2.81 — Bar 7, Beat 1
+    3.28 — Bar 8, Beat 1 — Pre-transition hold
+    3.75 — Bar 9, Beat 1
+    4.22 — Bar 10, Beat 1 — [DOWNBEAT] S2 entry
+    4.69 — Bar 11, Beat 1
+    5.16 — Bar 12, Beat 1 — Posture lines
+    5.63 — Bar 13, Beat 1
+    6.09 — Bar 14, Beat 1 — CTA
+    6.56 — Bar 15, Beat 1
+    7.03 — Bar 16, Beat 1
+    7.50 — Bar 17, Beat 1
+    7.97 — Bar 18, Beat 1
+    8.44 — Bar 19, Beat 1 — [DOWNBEAT] S3 entry
+    8.91 — Bar 20, Beat 1
+    9.38 — Bar 21, Beat 1 — Card cascade
+    9.84 — Bar 22, Beat 1
+    10.31 — Bar 23, Beat 1
+    10.78 — Bar 24, Beat 1
+    11.25 — Bar 25, Beat 1
+    11.72 — Bar 26, Beat 1
+    12.19 — Bar 27, Beat 1
+    12.66 — Bar 28, Beat 1
+    13.13 — Bar 29, Beat 1 — [BEAT] S3b entry
+    13.59 — Bar 30, Beat 1 — Testimonials
+    14.06 — Bar 31, Beat 1
+    14.53 — Bar 32, Beat 1
+    15.00 — Bar 33, Beat 1
+    15.47 — Bar 34, Beat 1 — [STRONG DOWNBEAT] S4 entry
+    15.94 — Bar 35, Beat 1
+    16.41 — Bar 36, Beat 1 — Skeleton
+    16.88 — Bar 37, Beat 1 — Metrics
+    17.34 — Bar 38, Beat 1 — Recording dot
+    17.81 — Bar 39, Beat 1 — Angle bars
+    18.28 — Bar 40, Beat 1
+    18.75 — Bar 41, Beat 1
+    19.22 — Bar 42, Beat 1
+    19.69 — Bar 43, Beat 1
+    20.16 — Bar 44, Beat 1
+    20.63 — Bar 45, Beat 1
+    21.09 — Bar 46, Beat 1 — [BEAT] S5 entry
+    21.56 — Bar 47, Beat 1 — Counter start
+    22.03 — Bar 48, Beat 1
+    22.50 — Bar 49, Beat 1 — Selectors
+    22.97 — Bar 50, Beat 1
+    23.44 — Bar 51, Beat 1 — Chart draw
+    23.91 — Bar 52, Beat 1
+    24.38 — Bar 53, Beat 1
+    24.84 — Bar 54, Beat 1
+    25.31 — Bar 55, Beat 1
+    25.78 — Bar 56, Beat 1
+    26.25 — Bar 57, Beat 1 — [DOWNBEAT] S6 entry
+    26.72 — Bar 58, Beat 1 — Logo reveal
+    27.19 — Bar 59, Beat 1 — Tagline
+    27.66 — Bar 60, Beat 1
+    28.13 — Bar 61, Beat 1
+    28.59 — Bar 62, Beat 1
+    29.06 — Bar 63, Beat 1 — Fade to black
+    29.53 — Bar 64, Beat 1
+    30.00 — Bar 65, Beat 1 — END
+  -->
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html
+  data-composition-variables='[
+    {"id":"size","type":"enum","label":"Logo Size","default":"large","options":[
+      {"value":"large","label":"Large (Hero)"},
+      {"value":"medium","label":"Medium"},
+      {"value":"small","label":"Small (Watermark)"}
+    ]},
+    {"id":"animation","type":"enum","label":"Animation Style","default":"reveal","options":[
+      {"value":"reveal","label":"Full Reveal"},
+      {"value":"pulse","label":"Ambient Pulse"},
+      {"value":"static","label":"Static"}
+    ]},
+    {"id":"glowIntensity","type":"number","label":"Glow Intensity","default":0.5}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  </head>
+  <body>
+    <template id="logo-template">
+      <div data-composition-id="logo" data-width="1920" data-height="1080" class="logo-root">
+        <style>
+          .logo-root {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            background: transparent;
+          }
+          .logo-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: baseline;
+            gap: 0;
+          }
+          .logo-letters {
+            display: flex;
+            align-items: baseline;
+          }
+          .logo-char {
+            font-family: "DM Sans", sans-serif;
+            font-weight: 900;
+            color: #F1F1FF;
+            letter-spacing: -0.03em;
+            will-change: transform, opacity;
+          }
+          .logo-char-u {
+            font-family: "DM Sans", sans-serif;
+            font-weight: 900;
+            color: #9B59FF;
+            letter-spacing: -0.03em;
+            will-change: transform, opacity;
+          }
+          .logo-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #9B59FF;
+            margin-left: -2px;
+            will-change: transform, opacity;
+          }
+          .logo-bracket {
+            position: absolute;
+            border-color: rgba(90, 31, 168, 0.6);
+            border-style: solid;
+            will-change: transform, opacity;
+          }
+          .bracket-tl {
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            border-width: 2px 0 0 2px;
+            border-radius: 2px 0 0 0;
+          }
+          .bracket-tr {
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border-width: 2px 2px 0 0;
+            border-radius: 0 2px 0 0;
+          }
+          .bracket-bl {
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            border-width: 0 0 2px 2px;
+            border-radius: 0 0 0 2px;
+          }
+          .bracket-br {
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border-width: 0 2px 2px 0;
+            border-radius: 0 0 2px 0;
+          }
+          .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(155, 89, 255, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            will-change: transform, opacity;
+          }
+          .logo-accent-line {
+            position: absolute;
+            bottom: calc(50% - 4px);
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 160px;
+            height: 1px;
+            background: rgba(123, 47, 214, 0.4);
+            transform-origin: center;
+            will-change: transform;
+          }
+        </style>
+
+        <div class="logo-container" id="logo-wrap">
+          <div class="logo-letters">
+            <span class="logo-char" id="lc-a">a</span>
+            <span class="logo-char" id="lc-i">i</span>
+            <span class="logo-char" id="lc-v">v</span>
+            <span class="logo-char-u" id="lc-u">U</span>
+            <span class="logo-dot" id="logo-dot-el"></span>
+          </div>
+          <div class="logo-bracket bracket-tl" id="br-tl"></div>
+          <div class="logo-bracket bracket-tr" id="br-tr"></div>
+          <div class="logo-bracket bracket-bl" id="br-bl"></div>
+          <div class="logo-bracket bracket-br" id="br-br"></div>
+          <div class="logo-glow" id="logo-glow-el"></div>
+          <div class="logo-accent-line" id="logo-accent"></div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+        <script>
+          window.__timelines = window.__timelines || {};
+          var vars = window.__hyperframes.getVariables();
+          var tl = gsap.timeline({ paused: true });
+
+          var sizeMultiplier = vars.size === "large" ? 1.0 : vars.size === "medium" ? 0.55 : 0.35;
+          var glowScale = vars.glowIntensity || 0.5;
+          var animType = vars.animation;
+
+          // Apply size
+          var fontSize = 180 * sizeMultiplier;
+          var bracketSize = 40 * sizeMultiplier;
+          var glowSize = 500 * sizeMultiplier;
+          var dotSize = Math.max(6, 10 * sizeMultiplier);
+
+          gsap.set(".logo-char", { fontSize: fontSize + "px" });
+          gsap.set(".logo-char-u", { fontSize: fontSize + "px" });
+          gsap.set(".logo-dot", { width: dotSize + "px", height: dotSize + "px" });
+          gsap.set(".logo-bracket", { width: bracketSize + "px", height: bracketSize + "px" });
+          gsap.set(".logo-glow", { width: glowSize + "px", height: glowSize + "px" });
+
+          if (animType === "reveal") {
+            // Full reveal animation
+            tl.set("#logo-glow-el", { opacity: 0, scale: 0.6 }, 0);
+            tl.set(".logo-char, .logo-char-u", { opacity: 0 }, 0);
+            tl.set(".logo-dot", { opacity: 0, scale: 0 }, 0);
+            tl.set(".logo-bracket", { opacity: 0 }, 0);
+            tl.set("#logo-accent", { scaleX: 0 }, 0);
+
+            // Glow appears first
+            tl.to("#logo-glow-el", { opacity: glowScale * 1.2, scale: 1, duration: 1.0, ease: "power2.out", overwrite: "auto" }, 0.1);
+            // Brackets draw in
+            tl.to("#br-tl", { opacity: 0.6, duration: 0.3, ease: "power2.out" }, 0.3);
+            tl.to("#br-tr", { opacity: 0.6, duration: 0.3, ease: "power2.out" }, 0.35);
+            tl.to("#br-bl", { opacity: 0.6, duration: 0.3, ease: "power2.out" }, 0.4);
+            tl.to("#br-br", { opacity: 0.6, duration: 0.3, ease: "power2.out" }, 0.45);
+            // Letters converge
+            tl.fromTo("#lc-a", { opacity: 0, x: -30, y: 15 }, { opacity: 1, x: 0, y: 0, duration: 0.5, ease: "power3.out" }, 0.5);
+            tl.fromTo("#lc-i", { opacity: 0, x: -15, y: -10 }, { opacity: 1, x: 0, y: 0, duration: 0.45, ease: "expo.out" }, 0.65);
+            tl.fromTo("#lc-v", { opacity: 0, x: 15, y: 12 }, { opacity: 1, x: 0, y: 0, duration: 0.5, ease: "power4.out" }, 0.7);
+            tl.fromTo("#lc-u", { opacity: 0, x: 30, y: -8 }, { opacity: 1, x: 0, y: 0, duration: 0.55, ease: "back.out(1.3)" }, 0.8);
+            // Dot pulses in
+            tl.fromTo("#logo-dot-el", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "elastic.out(1, 0.4)" }, 1.2);
+            // Accent line sweeps
+            tl.to("#logo-accent", { scaleX: 1, duration: 0.6, ease: "power3.out" }, 1.5);
+            // Glow breathing starts
+            tl.to("#logo-glow-el", { scale: 1.06, duration: 2.0, ease: "sine.inOut", yoyo: true, repeat: 1, overwrite: "auto" }, 1.8);
+            // Dot pulse
+            tl.to("#logo-dot-el", { scale: 1.3, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 1, overwrite: "auto" }, 2.2);
+
+          } else if (animType === "pulse") {
+            // Subtle ambient pulse
+            gsap.set(".logo-char, .logo-char-u, .logo-dot, .logo-bracket", { opacity: 1 });
+            gsap.set("#logo-accent", { scaleX: 1 });
+            gsap.set("#logo-glow-el", { opacity: glowScale * 0.6, scale: 1 });
+
+            tl.to("#logo-glow-el", { scale: 1.04, opacity: glowScale * 0.8, duration: 2.0, ease: "sine.inOut", yoyo: true, repeat: 1, overwrite: "auto" }, 0);
+            tl.to("#logo-dot-el", { scale: 1.15, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 1, overwrite: "auto" }, 0.3);
+
+          } else {
+            // Static — just set visible
+            gsap.set(".logo-char, .logo-char-u, .logo-dot, .logo-bracket", { opacity: 1 });
+            gsap.set("#logo-accent", { scaleX: 1 });
+            gsap.set("#logo-glow-el", { opacity: glowScale * 0.4, scale: 1 });
+          }
+
+          window.__timelines["logo"] = tl;
+        </script>
+      </div>
+    </template>
+  </body>
+</html>
